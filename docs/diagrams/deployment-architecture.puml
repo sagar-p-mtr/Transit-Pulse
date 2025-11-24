@@ -1,0 +1,310 @@
+@startuml Deployment Architecture - Where Is My Bus
+!theme blueprint
+title Deployment Architecture - Where Is My Bus Application
+
+' Define cloud and infrastructure colors
+!define CDN_COLOR #E8F5E8
+!define FRONTEND_COLOR #E3F2FD
+!define BACKEND_COLOR #FFF3E0
+!define DATABASE_COLOR #F3E5F5
+!define MONITORING_COLOR #FFEBEE
+
+' User Access Layer
+cloud "Internet" as INTERNET {
+  actor "Mobile Users" as MOBILE_USERS
+  actor "Desktop Users" as DESKTOP_USERS
+  actor "PWA Users" as PWA_USERS
+}
+
+' CDN & Edge Layer
+package "CDN & Edge Layer" <<CDN_COLOR>> {
+  cloud "Global CDN" as CDN {
+    [CloudFlare CDN]
+    [Edge Caching]
+    [SSL/TLS Termination]
+    [DDoS Protection]
+    [Geographic Distribution]
+  }
+  
+  cloud "Edge Locations" as EDGE {
+    [Mumbai Edge]
+    [Bangalore Edge]
+    [Delhi Edge]
+    [Chennai Edge]
+    [Hyderabad Edge]
+  }
+}
+
+' Frontend Infrastructure
+package "Frontend Infrastructure" <<FRONTEND_COLOR>> {
+  cloud "Static Hosting" as STATIC_HOST {
+    [Vercel/Netlify]
+    [GitHub Pages]
+    [AWS S3 + CloudFront]
+  }
+  
+  rectangle "Build & Deployment" as BUILD_DEPLOY {
+    [Vite Build Pipeline]
+    [Asset Optimization]
+    [Code Splitting]
+    [PWA Manifest]
+    [Service Worker]
+  }
+  
+  rectangle "Frontend Assets" as FRONTEND_ASSETS {
+    [HTML/CSS/JS Bundles]
+    [Images & Icons]
+    [Fonts & Styles]
+    [PWA Resources]
+    [Manifest Files]
+  }
+}
+
+' Backend Infrastructure
+package "Backend Infrastructure" <<BACKEND_COLOR>> {
+  cloud "API Gateway" as API_GATEWAY {
+    [Load Balancer]
+    [Rate Limiting]
+    [Authentication]
+    [Request Routing]
+    [API Versioning]
+  }
+  
+  rectangle "Microservices" as MICROSERVICES {
+    [Bus Data Service]
+    [Real-time Service]
+    [AI/ML Service]
+    [User Management Service]
+    [Notification Service]
+  }
+  
+  rectangle "WebSocket Infrastructure" as WEBSOCKET {
+    [Socket.io Cluster]
+    [Connection Pool]
+    [Message Queue]
+    [Event Broadcasting]
+  }
+  
+  rectangle "External API Integration" as EXTERNAL_APIS {
+    [BMTC API Proxy]
+    [KSRTC API Proxy]
+    [APSRTC API Proxy]
+    [OpenAI API Proxy]
+    [Maps API Proxy]
+  }
+}
+
+' Database & Storage Layer
+package "Database & Storage Layer" <<DATABASE_COLOR>> {
+  database "Primary Database" as PRIMARY_DB {
+    [PostgreSQL Cluster]
+    [User Data]
+    [Route Information]
+    [Historical Data]
+  }
+  
+  database "Cache Layer" as CACHE_LAYER {
+    [Redis Cluster]
+    [Session Storage]
+    [Real-time Data Cache]
+    [API Response Cache]
+  }
+  
+  database "Object Storage" as OBJECT_STORAGE {
+    [AWS S3/Google Cloud Storage]
+    [Static Assets]
+    [User Uploads]
+    [Backup Data]
+  }
+  
+  database "Search Engine" as SEARCH_ENGINE {
+    [Elasticsearch]
+    [Route Search Index]
+    [Stop Information Index]
+    [User Search History]
+  }
+}
+
+' Monitoring & Analytics
+package "Monitoring & Analytics" <<MONITORING_COLOR>> {
+  rectangle "Application Monitoring" as APP_MONITORING {
+    [Error Tracking (Sentry)]
+    [Performance Monitoring]
+    [Real User Monitoring]
+    [Uptime Monitoring]
+  }
+  
+  rectangle "Infrastructure Monitoring" as INFRA_MONITORING {
+    [Server Monitoring]
+    [Database Monitoring]
+    [Network Monitoring]
+    [Resource Utilization]
+  }
+  
+  rectangle "Analytics & Insights" as ANALYTICS {
+    [Google Analytics]
+    [User Behavior Tracking]
+    [Feature Usage Analytics]
+    [Performance Metrics]
+  }
+  
+  rectangle "Logging" as LOGGING {
+    [Centralized Logging]
+    [Log Aggregation]
+    [Error Logging]
+    [Audit Trails]
+  }
+}
+
+' Security Layer
+rectangle "Security & Compliance" as SECURITY {
+  [Web Application Firewall]
+  [SSL/TLS Encryption]
+  [API Security]
+  [Data Privacy Compliance]
+  [Authentication & Authorization]
+  [Vulnerability Scanning]
+}
+
+' Deployment Pipeline
+rectangle "CI/CD Pipeline" as CICD {
+  rectangle "Source Control" as SOURCE {
+    [GitHub Repository]
+    [Branch Protection]
+    [Code Review Process]
+  }
+  
+  rectangle "Build Pipeline" as BUILD_PIPELINE {
+    [GitHub Actions]
+    [Automated Testing]
+    [Code Quality Checks]
+    [Security Scanning]
+  }
+  
+  rectangle "Deployment Stages" as DEPLOY_STAGES {
+    [Development Environment]
+    [Staging Environment]
+    [Production Environment]
+    [Rollback Capability]
+  }
+}
+
+' Environment Configuration
+rectangle "Environment Management" as ENV_MANAGEMENT {
+  rectangle "Development" as DEV_ENV {
+    [Local Development]
+    [Mock APIs]
+    [Hot Reload]
+    [Debug Tools]
+  }
+  
+  rectangle "Staging" as STAGING_ENV {
+    [Pre-production Testing]
+    [Integration Testing]
+    [Performance Testing]
+    [User Acceptance Testing]
+  }
+  
+  rectangle "Production" as PROD_ENV {
+    [High Availability]
+    [Auto Scaling]
+    [Load Balancing]
+    [Disaster Recovery]
+  }
+}
+
+' Connection flows
+MOBILE_USERS --> INTERNET
+DESKTOP_USERS --> INTERNET
+PWA_USERS --> INTERNET
+
+INTERNET --> CDN : "HTTPS Requests"
+CDN --> EDGE : "Edge Distribution"
+EDGE --> STATIC_HOST : "Origin Pull"
+
+STATIC_HOST --> FRONTEND_ASSETS : "Serve Static Files"
+BUILD_DEPLOY --> FRONTEND_ASSETS : "Deploy Built Assets"
+
+CDN --> API_GATEWAY : "API Requests"
+API_GATEWAY --> MICROSERVICES : "Route Requests"
+API_GATEWAY --> WEBSOCKET : "WebSocket Connections"
+
+MICROSERVICES --> EXTERNAL_APIS : "External API Calls"
+MICROSERVICES --> PRIMARY_DB : "Data Operations"
+MICROSERVICES --> CACHE_LAYER : "Cache Operations"
+MICROSERVICES --> SEARCH_ENGINE : "Search Queries"
+
+WEBSOCKET --> CACHE_LAYER : "Real-time Data"
+EXTERNAL_APIS --> OBJECT_STORAGE : "Data Backup"
+
+' Monitoring connections
+STATIC_HOST --> APP_MONITORING : "Frontend Metrics"
+MICROSERVICES --> APP_MONITORING : "Backend Metrics"
+PRIMARY_DB --> INFRA_MONITORING : "Database Metrics"
+CDN --> ANALYTICS : "Traffic Analytics"
+
+' CI/CD connections
+SOURCE --> BUILD_PIPELINE : "Code Push"
+BUILD_PIPELINE --> DEPLOY_STAGES : "Automated Deployment"
+DEPLOY_STAGES --> STATIC_HOST : "Frontend Deployment"
+DEPLOY_STAGES --> MICROSERVICES : "Backend Deployment"
+
+' Environment connections
+DEV_ENV --> STAGING_ENV : "Promotion"
+STAGING_ENV --> PROD_ENV : "Release"
+
+' Security integration
+SECURITY --> CDN : "WAF Protection"
+SECURITY --> API_GATEWAY : "API Security"
+SECURITY --> PRIMARY_DB : "Data Encryption"
+
+' Scalability and Performance Notes
+note right of CDN
+  Global Performance:
+  • 99.9% uptime SLA
+  • Sub-100ms response time
+  • Automatic scaling
+  • Global edge locations
+  • Bandwidth optimization
+end note
+
+note right of MICROSERVICES
+  Service Architecture:
+  • Containerized deployment
+  • Horizontal auto-scaling
+  • Health check monitoring
+  • Circuit breaker pattern
+  • Graceful degradation
+end note
+
+note right of PRIMARY_DB
+  Database Strategy:
+  • Master-slave replication
+  • Automated backups
+  • Point-in-time recovery
+  • Connection pooling
+  • Query optimization
+end note
+
+note right of WEBSOCKET
+  Real-time Infrastructure:
+  • Sticky session support
+  • Horizontal scaling
+  • Connection failover
+  • Message persistence
+  • Event sourcing
+end note
+
+' Deployment Strategy Note
+note bottom
+  Deployment Strategy:
+  • Blue-Green Deployment for zero downtime
+  • Canary releases for gradual rollout
+  • Feature flags for controlled feature release
+  • Automated rollback on failure detection
+  • Infrastructure as Code (IaC) using Terraform
+  • Container orchestration with Kubernetes
+  • Multi-region deployment for disaster recovery
+end note
+
+@enduml

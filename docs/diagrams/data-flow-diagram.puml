@@ -1,0 +1,170 @@
+@startuml Data Flow Diagram - Where Is My Bus
+!theme blueprint
+title Data Flow Diagram - Where Is My Bus Application
+
+' Define styles for different data types
+skinparam activity {
+  BackgroundColor #F8F9FA
+  BorderColor #6C757D
+  FontSize 11
+}
+
+skinparam database {
+  BackgroundColor #E9ECEF
+  BorderColor #495057
+}
+
+' External Data Sources
+database "BMTC API" as BMTC_API
+database "KSRTC API" as KSRTC_API
+database "APSRTC API" as APSRTC_API
+database "OpenAI API" as OPENAI_API
+database "Maps API" as MAPS_API
+
+' Data Processing Layer
+rectangle "Data Processing Layer" {
+  activity "API Service" as API_SERVICE
+  activity "Real-time Service" as REALTIME_SERVICE
+  activity "AI Service" as AI_SERVICE
+  activity "Geolocation Service" as GEO_SERVICE
+  activity "Voice Service" as VOICE_SERVICE
+}
+
+' Data Storage Layer
+rectangle "Data Storage Layer" {
+  database "Browser Cache\n(IndexedDB)" as INDEXEDDB
+  database "Local Storage" as LOCALSTORAGE
+  database "Session Storage" as SESSIONSTORAGE
+  database "Service Worker Cache" as SW_CACHE
+}
+
+' Application State Layer
+rectangle "Application State Layer" {
+  activity "Theme Context" as THEME_CONTEXT
+  activity "Zustand Store" as ZUSTAND_STORE
+  activity "Component State" as COMPONENT_STATE
+  activity "Custom Hooks" as CUSTOM_HOOKS
+}
+
+' UI Components Layer
+rectangle "UI Components Layer" {
+  activity "Search Component" as SEARCH_COMP
+  activity "Map Component" as MAP_COMP
+  activity "Live Tracking" as LIVE_TRACKING
+  activity "AI Assistant" as AI_ASSISTANT
+  activity "AR Navigation" as AR_NAV
+  activity "3D Visualization" as VIZ_3D
+}
+
+' User Interaction Layer
+actor "User" as USER
+
+' Data Flow Connections with Labels
+
+' User Input Flows
+USER --> SEARCH_COMP : "1. Search Query"
+USER --> AI_ASSISTANT : "2. Voice/Text Input"
+USER --> AR_NAV : "3. Camera Access"
+USER --> MAP_COMP : "4. Map Interactions"
+
+' Search Flow
+SEARCH_COMP --> API_SERVICE : "5. Search Request\n{query, filters}"
+API_SERVICE --> BMTC_API : "6. Query BMTC Routes"
+API_SERVICE --> KSRTC_API : "7. Query KSRTC Routes"
+API_SERVICE --> APSRTC_API : "8. Query APSRTC Routes"
+
+BMTC_API --> API_SERVICE : "9. Route Data\n{routes[], buses[], stops[]}"
+KSRTC_API --> API_SERVICE : "10. Route Data"
+APSRTC_API --> API_SERVICE : "11. Route Data"
+
+API_SERVICE --> INDEXEDDB : "12. Cache Route Data"
+API_SERVICE --> SEARCH_COMP : "13. Processed Results\n{normalizedRoutes[]}"
+
+' Real-time Data Flow
+API_SERVICE --> REALTIME_SERVICE : "14. Subscribe to Updates"
+REALTIME_SERVICE --> MAP_COMP : "15. Live Bus Positions\n{busId, lat, lng, timestamp}"
+REALTIME_SERVICE --> LIVE_TRACKING : "16. Route Updates\n{routeId, buses[], eta}"
+
+MAP_COMP --> INDEXEDDB : "17. Cache Position Data"
+LIVE_TRACKING --> COMPONENT_STATE : "18. Update UI State"
+
+' AI Assistant Flow
+AI_ASSISTANT --> VOICE_SERVICE : "19. Voice Input\n{audioBlob}"
+VOICE_SERVICE --> AI_SERVICE : "20. Transcribed Text\n{text, language}"
+AI_SERVICE --> OPENAI_API : "21. NLP Request\n{prompt, context}"
+OPENAI_API --> AI_SERVICE : "22. AI Response\n{answer, suggestions[]}"
+AI_SERVICE --> AI_ASSISTANT : "23. Formatted Response"
+
+' Geolocation Flow
+AR_NAV --> GEO_SERVICE : "24. Location Request"
+GEO_SERVICE --> MAPS_API : "25. Geocoding Request"
+MAPS_API --> GEO_SERVICE : "26. Location Data\n{coordinates, address}"
+GEO_SERVICE --> AR_NAV : "27. AR Positioning Data"
+
+' State Management Flow
+THEME_CONTEXT --> LOCALSTORAGE : "28. Persist Theme\n{theme, accentColor}"
+ZUSTAND_STORE --> SESSIONSTORAGE : "29. Session Data\n{userPrefs, history}"
+CUSTOM_HOOKS --> COMPONENT_STATE : "30. State Updates"
+
+' Offline Data Flow
+API_SERVICE --> SW_CACHE : "31. Cache API Responses"
+SW_CACHE --> API_SERVICE : "32. Serve Cached Data\n(when offline)"
+INDEXEDDB --> LIVE_TRACKING : "33. Offline Route Data"
+
+' 3D Visualization Data Flow
+LIVE_TRACKING --> VIZ_3D : "34. Bus Telemetry\n{speed, occupancy, route}"
+VIZ_3D --> COMPONENT_STATE : "35. 3D Model State"
+
+' Error Handling Flow
+API_SERVICE --> CUSTOM_HOOKS : "36. Error Events\n{errorType, message}"
+CUSTOM_HOOKS --> USER : "37. Error Notifications"
+
+' Data Synchronization
+INDEXEDDB --> API_SERVICE : "38. Sync Check\n{lastUpdate, version}"
+API_SERVICE --> INDEXEDDB : "39. Data Update\n{freshData, timestamp}"
+
+' Notes for key data flows
+note right of API_SERVICE
+  Data Processing:
+  - Normalizes data from multiple APIs
+  - Handles fallback to mock data
+  - Implements retry logic
+  - Caches frequently accessed data
+end note
+
+note right of REALTIME_SERVICE
+  Real-time Updates:
+  - WebSocket connection management
+  - Event broadcasting
+  - Connection state monitoring
+  - Automatic reconnection
+end note
+
+note right of INDEXEDDB
+  Offline Storage:
+  - Route information
+  - Bus stop details
+  - User preferences
+  - Search history
+  - Cached API responses
+end note
+
+note right of AI_SERVICE
+  AI Processing:
+  - Natural language understanding
+  - Context-aware responses
+  - Route recommendations
+  - Fare calculations
+end note
+
+' Data Types Legend
+note bottom
+  Data Types:
+  • Route Data: {id, name, stops[], provider, schedule}
+  • Bus Data: {id, routeId, position, occupancy, eta}
+  • User Input: {query, filters, preferences}
+  • Real-time Updates: {busPositions[], alerts[], delays[]}
+  • AI Context: {userQuery, busData, routeData, history}
+end note
+
+@enduml

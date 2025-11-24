@@ -1,0 +1,205 @@
+@startuml System Architecture - Where Is My Bus
+!theme blueprint
+title Where Is My Bus - System Architecture
+
+' Define colors for different layers
+!define FRONTEND_COLOR #E3F2FD
+!define BACKEND_COLOR #FFF3E0
+!define DATABASE_COLOR #F3E5F5
+!define EXTERNAL_COLOR #E8F5E8
+!define REALTIME_COLOR #FFEBEE
+
+' Frontend Layer
+package "Frontend Layer" <<FRONTEND_COLOR>> {
+  component "React Application" as ReactApp {
+    component "Core Components" as CoreComponents {
+      [Header]
+      [Navigation]
+      [SearchSection]
+      [LiveTracking]
+      [BusRouteMap]
+    }
+    
+    component "Advanced Features" as AdvancedFeatures {
+      [AI Assistant]
+      [AR Navigation]
+      [3D Visualization]
+      [Social Features]
+      [Voice Control]
+    }
+    
+    component "State Management" as StateManagement {
+      [Theme Context]
+      [Zustand Store]
+      [React Hooks]
+    }
+    
+    component "UI/UX Layer" as UILayer {
+      [Glass Morphism]
+      [Dark Mode]
+      [Animations]
+      [Responsive Design]
+    }
+  }
+  
+  component "PWA Features" as PWA {
+    [Service Worker]
+    [Offline Storage]
+    [Push Notifications]
+    [App Installation]
+  }
+}
+
+' Backend Services Layer
+package "Backend Services" <<BACKEND_COLOR>> {
+  component "API Gateway" as APIGateway
+  
+  component "Bus Tracking Services" as BusServices {
+    [BMTC API Service]
+    [KSRTC API Service]
+    [APSRTC API Service]
+    [Other Providers API]
+  }
+  
+  component "Real-time Services" as RealtimeServices {
+    [WebSocket Server]
+    [Event Broadcasting]
+    [Connection Management]
+    [Heartbeat Monitor]
+  }
+  
+  component "AI/ML Services" as AIServices {
+    [Natural Language Processing]
+    [Route Recommendation]
+    [Fare Calculation]
+    [Context Analysis]
+  }
+  
+  component "Geolocation Services" as GeoServices {
+    [Route Calculation]
+    [Distance Computation]
+    [AR Positioning]
+    [Map Integration]
+  }
+}
+
+' Data Layer
+package "Data Layer" <<DATABASE_COLOR>> {
+  database "Primary Database" as MainDB {
+    [User Profiles]
+    [Route Data]
+    [Bus Information]
+    [Historical Data]
+  }
+  
+  database "Cache Layer" as CacheDB {
+    [Redis Cache]
+    [Session Data]
+    [Real-time Data]
+  }
+  
+  database "Offline Storage" as OfflineDB {
+    [IndexedDB]
+    [Local Storage]
+    [Service Worker Cache]
+  }
+}
+
+' External Services
+package "External Services" <<EXTERNAL_COLOR>> {
+  cloud "Bus Operator APIs" as BusAPIs {
+    [BMTC Official API]
+    [KSRTC Official API]
+    [APSRTC Official API]
+    [TNSTC API]
+  }
+  
+  cloud "Third-party Services" as ThirdParty {
+    [Google Maps API]
+    [OpenStreetMap]
+    [Weather API]
+    [Traffic API]
+  }
+  
+  cloud "AI/ML Platforms" as MLPlatforms {
+    [OpenAI API]
+    [Speech Recognition]
+    [Language Detection]
+  }
+}
+
+' Real-time Infrastructure
+package "Real-time Infrastructure" <<REALTIME_COLOR>> {
+  component "WebSocket Infrastructure" as WSInfra {
+    [Socket.io Server]
+    [Connection Pool]
+    [Event Queue]
+    [Broadcasting Engine]
+  }
+  
+  component "Message Queue" as MessageQueue {
+    [Bus Position Updates]
+    [Route Changes]
+    [Alert System]
+    [User Notifications]
+  }
+}
+
+' User Devices
+actor "Mobile User" as MobileUser
+actor "Desktop User" as DesktopUser
+actor "Admin User" as AdminUser
+
+' Connections
+MobileUser --> ReactApp : "Access via Mobile Browser/PWA"
+DesktopUser --> ReactApp : "Access via Web Browser"
+AdminUser --> ReactApp : "Admin Dashboard"
+
+ReactApp --> APIGateway : "REST API Calls"
+ReactApp --> WSInfra : "WebSocket Connection"
+ReactApp --> OfflineDB : "Offline Data Storage"
+
+APIGateway --> BusServices : "Route to Services"
+APIGateway --> AIServices : "AI Requests"
+APIGateway --> GeoServices : "Location Services"
+
+BusServices --> BusAPIs : "Fetch Bus Data"
+BusServices --> MainDB : "Store/Retrieve Data"
+BusServices --> CacheDB : "Cache Frequent Data"
+
+RealtimeServices --> WSInfra : "Real-time Updates"
+RealtimeServices --> MessageQueue : "Event Processing"
+
+AIServices --> MLPlatforms : "AI Processing"
+GeoServices --> ThirdParty : "Map & Location Data"
+
+WSInfra --> ReactApp : "Real-time Data Push"
+MessageQueue --> WSInfra : "Event Broadcasting"
+
+MainDB <--> CacheDB : "Data Synchronization"
+
+note right of ReactApp
+  Modern React 18 with TypeScript
+  - Framer Motion animations
+  - Tailwind CSS styling
+  - i18next internationalization
+  - Responsive design
+end note
+
+note right of BusServices
+  Multi-provider support:
+  - BMTC (Bangalore)
+  - KSRTC (Karnataka)
+  - APSRTC (Andhra Pradesh)
+  - TNSTC (Tamil Nadu)
+end note
+
+note right of AdvancedFeatures
+  Cutting-edge features:
+  - AR-based navigation
+  - AI-powered assistance
+  - 3D bus visualization
+  - Social ride sharing
+end note
+
+@enduml

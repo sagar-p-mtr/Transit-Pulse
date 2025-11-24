@@ -1,0 +1,312 @@
+@startuml Seat Analyzer - Database Schema
+!theme aws-orange
+
+title Seat Vacancy Analyzer - Comprehensive Database Schema
+
+skinparam backgroundColor #f8f9fa
+skinparam defaultFontSize 10
+
+package "Core Seat Management" as CoreSeat {
+  entity "seat_layouts" as SeatLayouts {
+    --
+    * id : UUID (PK)
+    --
+    * bus_type : VARCHAR(50)
+    * total_seats : INT
+    * seat_configuration : JSONB
+    * layout_type : VARCHAR(20)
+    * has_wheelchair_access : BOOLEAN
+    * ac_seat_numbers : JSONB
+    * premium_seat_numbers : JSONB
+    * created_at : TIMESTAMP
+    --
+    seat_configuration example:
+    {
+      "rows": 8,
+      "seatsPerRow": 4,
+      "layout": "2+2",
+      "aislePosition": "center"
+    }
+  }
+
+  entity "real_time_seat_status" as RealTimeSeats {
+    --
+    * id : UUID (PK)
+    --
+    * bus_id : VARCHAR(50) (FK)
+    * seat_number : INT
+    * is_occupied : BOOLEAN
+    * sensor_weight : DECIMAL(5,2)
+    * confidence_score : DECIMAL(3,2)
+    * last_change_time : TIMESTAMP
+    * boarding_stop_id : VARCHAR(50)
+    * estimated_alighting_stop : VARCHAR(50)
+    * passenger_type : VARCHAR(20)
+    * timestamp : TIMESTAMP
+    --
+    UNIQUE(bus_id, seat_number)
+  }
+
+  entity "seat_occupancy_simulation" as SeatSim {
+    --
+    * id : UUID (PK)
+    --
+    * bus_id : VARCHAR(50) (FK)
+    * seat_number : INT
+    * is_occupied : BOOLEAN
+    * passenger_type : VARCHAR(20)
+    * boarding_stop : VARCHAR(50)
+    * alighting_stop : VARCHAR(50)
+    * simulated_at : TIMESTAMP
+    * simulation_scenario : VARCHAR(50)
+    --
+    For Approach 1 (Simulation)
+  }
+}
+
+package "Reservation System" as Reservation {
+  entity "seat_reservations" as Reservations {
+    --
+    * id : UUID (PK)
+    --
+    * user_id : UUID (FK)
+    * bus_id : VARCHAR(50) (FK)
+    * route_id : VARCHAR(50) (FK)
+    * seat_number : INT
+    * boarding_stop : VARCHAR(50)
+    * alighting_stop : VARCHAR(50)
+    * reservation_time : TIMESTAMP
+    * expires_at : TIMESTAMP
+    * checked_in_at : TIMESTAMP
+    * payment_status : VARCHAR(20)
+    * cancellation_reason : TEXT
+    * status : VARCHAR(20)
+    * fare_amount : DECIMAL(8,2)
+    * qr_code : VARCHAR(255)
+    * created_at : TIMESTAMP
+  }
+
+  entity "seat_preferences" as Preferences {
+    --
+    * id : UUID (PK)
+    --
+    * user_id : UUID (FK)
+    * seat_type_preference : VARCHAR(20)
+    * position_preference : VARCHAR(20)
+    * ac_proximity_important : BOOLEAN
+    * avoid_wheel_well : BOOLEAN
+    * wheelchair_accessible_needed : BOOLEAN
+    * window_preference : BOOLEAN
+    * quiet_zone_preference : BOOLEAN
+    * created_at : TIMESTAMP
+    --
+    UNIQUE(user_id)
+  }
+
+  entity "reservation_payments" as Payments {
+    --
+    * id : UUID (PK)
+    --
+    * reservation_id : UUID (FK)
+    * payment_gateway : VARCHAR(50)
+    * transaction_id : VARCHAR(255)
+    * amount : DECIMAL(8,2)
+    * currency : VARCHAR(3)
+    * payment_method : VARCHAR(50)
+    * status : VARCHAR(20)
+    * gateway_response : JSONB
+    * processed_at : TIMESTAMP
+  }
+}
+
+package "Analytics & Predictions" as Analytics {
+  entity "seat_analytics" as SeatAnalytics {
+    --
+    * id : UUID (PK)
+    --
+    * bus_id : VARCHAR(50) (FK)
+    * seat_number : INT
+    * total_occupancy_time : INTERVAL
+    * avg_occupancy_duration : INTERVAL
+    * peak_usage_hours : JSONB
+    * passenger_type_distribution : JSONB
+    * utilization_rate : DECIMAL(5,2)
+    * revenue_generated : DECIMAL(8,2)
+    * date : DATE
+    --
+    UNIQUE(bus_id, seat_number, date)
+  }
+
+  entity "seat_availability_predictions" as Predictions {
+    --
+    * id : UUID (PK)
+    --
+    * route_id : VARCHAR(50) (FK)
+    * departure_time : TIMESTAMP
+    * stop_id : VARCHAR(50)
+    * predicted_available_seats : JSONB
+    * seat_type_availability : JSONB
+    * confidence_score : DECIMAL(3,2)
+    * factors : JSONB
+    * model_version : VARCHAR(50)
+    * created_at : TIMESTAMP
+    --
+    predicted_available_seats example:
+    {
+      "window": 5,
+      "aisle": 3,
+      "total": 8,
+      "premium": 2
+    }
+  }
+
+  entity "seat_journey_analytics" as JourneyAnalytics {
+    --
+    * id : UUID (PK)
+    --
+    * bus_id : VARCHAR(50) (FK)
+    * seat_number : INT
+    * journey_id : UUID
+    * boarding_stop : VARCHAR(50)
+    * alighting_stop : VARCHAR(50)
+    * occupancy_duration : INTERVAL
+    * passenger_profile : JSONB
+    * satisfaction_rating : INT
+    * comfort_rating : INT
+    * cleanliness_rating : INT
+    * date : DATE
+    * created_at : TIMESTAMP
+  }
+}
+
+package "IoT & Hardware" as IoT {
+  entity "seat_sensors" as Sensors {
+    --
+    * id : UUID (PK)
+    --
+    * bus_id : VARCHAR(50) (FK)
+    * seat_number : INT
+    * sensor_type : VARCHAR(30)
+    * sensor_id : VARCHAR(100)
+    * calibration_weight : DECIMAL(5,2)
+    * battery_level : INT
+    * last_maintenance : DATE
+    * status : VARCHAR(20)
+    * firmware_version : VARCHAR(20)
+    * installed_at : TIMESTAMP
+    --
+    UNIQUE(bus_id, seat_number, sensor_type)
+  }
+
+  entity "sensor_readings" as Readings {
+    --
+    * id : BIGSERIAL (PK)
+    --
+    * sensor_id : UUID (FK)
+    * reading_type : VARCHAR(20)
+    * raw_value : DECIMAL(8,3)
+    * processed_value : DECIMAL(8,3)
+    * quality_score : DECIMAL(3,2)
+    * ambient_temperature : DECIMAL(5,2)
+    * humidity : DECIMAL(5,2)
+    * timestamp : TIMESTAMP
+    --
+    Partitioned by timestamp
+  }
+
+  entity "iot_device_status" as DeviceStatus {
+    --
+    * id : UUID (PK)
+    --
+    * bus_id : VARCHAR(50) (FK)
+    * device_type : VARCHAR(30)
+    * device_id : VARCHAR(100)
+    * is_online : BOOLEAN
+    * last_heartbeat : TIMESTAMP
+    * error_count : INT
+    * data_quality_score : DECIMAL(3,2)
+    * maintenance_required : BOOLEAN
+    * created_at : TIMESTAMP
+  }
+}
+
+package "User Experience" as UX {
+  entity "seat_ratings_feedback" as Feedback {
+    --
+    * id : UUID (PK)
+    --
+    * user_id : UUID (FK)
+    * bus_id : VARCHAR(50) (FK)
+    * seat_number : INT
+    * overall_rating : INT
+    * comfort_rating : INT
+    * cleanliness_rating : INT
+    * noise_level_rating : INT
+    * temperature_rating : INT
+    * feedback_text : TEXT
+    * journey_date : DATE
+    * created_at : TIMESTAMP
+  }
+
+  entity "seat_recommendation_history" as RecommendHistory {
+    --
+    * id : UUID (PK)
+    --
+    * user_id : UUID (FK)
+    * recommended_seat : INT
+    * actual_selected_seat : INT
+    * recommendation_factors : JSONB
+    * user_satisfaction : INT
+    * recommendation_accuracy : DECIMAL(3,2)
+    * created_at : TIMESTAMP
+  }
+}
+
+' Relationships
+SeatLayouts ||--o{ RealTimeSeats : defines
+SeatLayouts ||--o{ SeatSim : defines
+SeatLayouts ||--o{ Reservations : references
+SeatLayouts ||--o{ Sensors : contains
+
+RealTimeSeats ||--o{ SeatAnalytics : aggregates
+Reservations ||--o{ Payments : has
+Reservations ||--o{ JourneyAnalytics : generates
+
+Sensors ||--o{ Readings : produces
+Sensors ||--o{ DeviceStatus : monitors
+
+Preferences ||--o{ Reservations : influences
+Preferences ||--o{ RecommendHistory : guides
+
+Reservations ||--o{ Feedback : receives
+JourneyAnalytics ||--o{ Predictions : trains
+
+note bottom of CoreSeat
+  **Core Tables:**
+  • seat_layouts: Bus seat configurations
+  • real_time_seat_status: Live occupancy data
+  • seat_occupancy_simulation: For Approach 1
+end note
+
+note bottom of Reservation
+  **Reservation System:**
+  • seat_reservations: Booking management
+  • seat_preferences: User preferences
+  • reservation_payments: Payment processing
+end note
+
+note bottom of Analytics
+  **Analytics & ML:**
+  • seat_analytics: Daily aggregated data
+  • seat_availability_predictions: ML predictions
+  • seat_journey_analytics: Journey insights
+end note
+
+note bottom of IoT
+  **IoT Integration:**
+  • seat_sensors: Hardware inventory
+  • sensor_readings: Raw sensor data
+  • iot_device_status: Device health monitoring
+end note
+
+@enduml

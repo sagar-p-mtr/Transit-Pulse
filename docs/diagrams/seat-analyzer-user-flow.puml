@@ -1,0 +1,150 @@
+@startuml Seat Analyzer - User Flow & Data Flow
+!theme aws-orange
+
+title Seat Vacancy Analyzer - User Flow & Data Flow Diagram
+
+skinparam backgroundColor #f8f9fa
+skinparam defaultFontSize 11
+
+actor "Bus Passenger" as User
+actor "Bus Driver" as Driver
+actor "System Admin" as Admin
+
+participant "Mobile App" as App
+participant "3D Seat Visualization" as SeatViz
+participant "Backend API" as API
+participant "Real-time Engine" as RealTime
+participant "Database" as DB
+participant "IoT Sensors" as IoT
+participant "Payment Gateway" as Payment
+
+== User Journey: Checking Seat Availability ==
+
+User -> App : Open app, select route
+App -> API : GET /api/routes/{routeId}/buses
+API -> DB : Query available buses
+DB --> API : Return bus list with crowd levels
+API --> App : Bus list with seat availability
+App -> SeatViz : Display 3D bus with seat map
+SeatViz --> User : Interactive seat visualization
+
+note right of User
+  **User sees:**
+  • Available seats (green)
+  • Occupied seats (red)
+  • Reserved seats (yellow)
+  • Premium seats (blue)
+  • Predicted availability
+end note
+
+== Real-time Seat Updates ==
+
+IoT -> RealTime : Sensor data (seat occupied/vacant)
+RealTime -> API : Process sensor readings
+API -> DB : UPDATE real_time_seat_status
+DB --> API : Confirm update
+API -> App : WebSocket broadcast
+App -> SeatViz : Update seat status
+SeatViz --> User : Live seat map update
+
+note right of IoT
+  **Sensor Data:**
+  • Pressure readings
+  • Weight detection
+  • Occupancy changes
+  • Confidence scores
+  • Timestamp
+end note
+
+== Seat Reservation Flow ==
+
+User -> SeatViz : Select preferred seat
+SeatViz -> App : Seat selection
+App -> API : POST /api/reservations/create
+API -> DB : Check seat availability
+DB --> API : Seat available confirmation
+API -> Payment : Initiate payment
+Payment --> API : Payment confirmation
+API -> DB : CREATE seat reservation
+DB --> API : Reservation created
+API --> App : Reservation success + QR code
+App --> User : Digital boarding pass
+
+note left of Payment
+  **Payment Options:**
+  • UPI/Digital wallets
+  • Credit/Debit cards
+  • BMTC pass balance
+  • Cash on board
+end note
+
+== Boarding Process ==
+
+User -> Driver : Show QR code
+Driver -> App : Scan QR code
+App -> API : POST /api/reservations/checkin
+API -> DB : UPDATE reservation status
+DB --> API : Check-in confirmed
+API -> RealTime : Broadcast seat occupied
+RealTime -> SeatViz : Update seat status
+SeatViz --> "Other Users" : Real-time seat update
+
+== Predictive Analytics Flow ==
+
+loop Every 15 minutes
+  API -> DB : Collect historical data
+  API -> "ML Engine" : Run prediction model
+  "ML Engine" --> API : Seat availability predictions
+  API -> DB : UPSERT seat_availability_predictions
+  DB --> API : Predictions stored
+  API -> App : Push predictions to users
+  App --> User : "Seat available in 10 mins"
+end
+
+== Admin Monitoring ==
+
+Admin -> "Admin Dashboard" : Monitor system
+"Admin Dashboard" -> API : GET /api/admin/analytics
+API -> DB : Query seat analytics
+DB --> API : Analytics data
+API --> "Admin Dashboard" : System health & metrics
+
+note right of "Admin Dashboard"
+  **Admin Views:**
+  • Real-time occupancy
+  • Revenue analytics
+  • IoT device status
+  • User satisfaction
+  • Prediction accuracy
+end note
+
+== Error Handling & Maintenance ==
+
+IoT -> RealTime : Sensor malfunction
+RealTime -> API : Log sensor error
+API -> DB : UPDATE iot_device_status
+API -> Admin : Alert notification
+Admin -> "Maintenance Team" : Schedule maintenance
+"Maintenance Team" -> IoT : Fix/replace sensor
+IoT -> RealTime : Resume normal operation
+
+== Data Analytics Loop ==
+
+loop Daily
+  DB -> "Analytics Engine" : Extract journey data
+  "Analytics Engine" -> DB : Generate seat_analytics
+  "Analytics Engine" -> "ML Engine" : Train prediction models
+  "ML Engine" -> DB : Update model accuracy
+  DB -> API : Serve improved predictions
+end
+
+note bottom of DB
+  **Data Flow:**
+  1. IoT sensors provide real-time data
+  2. User interactions create reservations
+  3. Analytics improve predictions
+  4. ML models optimize recommendations
+  5. Feedback loop enhances accuracy
+end note
+
+@enduml

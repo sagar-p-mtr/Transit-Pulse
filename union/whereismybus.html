@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+	<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>WhereIsMyBus India &mdash; Real-time Bus Tracking Solution</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Real-time bus tracking and schedule information to help you plan your journey across India" />
+	<meta name="keywords" content="bus tracking, real-time, india, bmtc, ksrtc, public transport" />
+	<meta name="author" content="WhereIsMyBus India" />
+
+	<!-- Facebook and Twitter integration -->
+	<meta property="og:title" content="WhereIsMyBus India - Real-time Bus Tracking"/>
+	<meta property="og:description" content="Track buses in real-time across India"/>
+	<meta property="og:url" content=""/>
+	<meta property="og:site_name" content="WhereIsMyBus India"/>
+	<meta name="twitter:title" content="WhereIsMyBus India" />
+	<meta name="twitter:image" content="" />
+	<meta name="twitter:url" content="" />
+	<meta name="twitter:card" content="" />
+
+	<!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+	<link rel="shortcut icon" href="favicon.ico">
+
+	<link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+	
+	<!-- Animate.css -->
+	<link rel="stylesheet" href="css/animate.css">
+	<!-- Icomoon Icon Fonts-->
+	<link rel="stylesheet" href="css/icomoon.css">
+	<!-- Simple Line Icons -->
+	<link rel="stylesheet" href="css/simple-line-icons.css">
+	<!-- Bootstrap  -->
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<!-- Owl Carousel  -->
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+	<!-- Style -->
+	<link rel="stylesheet" href="css/style.css">
+	
+	<!-- Leaflet CSS -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+	
+	<!-- Custom styles for bus tracking -->
+	<style>
+		.bus-map-container {
+			height: 400px;
+			width: 100%;
+			border-radius: 8px;
+			overflow: hidden;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		}
+		
+		.bus-route-card {
+			border: 1px solid #e0e0e0;
+			border-radius: 8px;
+			padding: 15px;
+			margin-bottom: 15px;
+			transition: all 0.3s ease;
+			cursor: pointer;
+		}
+		
+		.bus-route-card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		}
+		
+		.bus-route-card.selected {
+			border-color: #3B82F6;
+			background-color: #EBF8FF;
+		}
+		
+		.crowd-indicator {
+			display: inline-block;
+			width: 12px;
+			height: 12px;
+			border-radius: 50%;
+			margin-right: 8px;
+		}
+		
+		.crowd-low { background-color: #10B981; }
+		.crowd-medium { background-color: #F59E0B; }
+		.crowd-high { background-color: #EF4444; }
+		
+		.bus-info-panel {
+			background: white;
+			border-radius: 8px;
+			padding: 20px;
+			margin-bottom: 20px;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		}
+		
+		.provider-badge {
+			display: inline-block;
+			padding: 4px 8px;
+			border-radius: 4px;
+			font-size: 12px;
+			font-weight: 600;
+			margin-right: 8px;
+		}
+		
+		.provider-bmtc { background-color: #3B82F6; color: white; }
+		.provider-ksrtc { background-color: #10B981; color: white; }
+		.provider-apsrtc { background-color: #F59E0B; color: white; }
+		.provider-tnstc { background-color: #8B5CF6; color: white; }
+		.provider-best { background-color: #EF4444; color: white; }
+		.provider-dtc { background-color: #6B7280; color: white; }
+		
+		.search-container {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			padding: 40px 0;
+		}
+		
+		.feature-icon {
+			font-size: 3rem;
+			color: #3B82F6;
+			margin-bottom: 20px;
+		}
+		
+		.stats-counter {
+			font-size: 3rem;
+			font-weight: bold;
+			color: #3B82F6;
+		}
+		
+		.schedule-item {
+			padding: 10px;
+			border-bottom: 1px solid #e0e0e0;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		
+		.schedule-time {
+			font-weight: 600;
+			color: #3B82F6;
+		}
+		
+		.delay-indicator {
+			padding: 2px 6px;
+			border-radius: 4px;
+			font-size: 11px;
+			font-weight: 600;
+		}
+		
+		.delay-ontime { background-color: #D1FAE5; color: #065F46; }
+		.delay-minor { background-color: #FEF3C7; color: #92400E; }
+		.delay-major { background-color: #FEE2E2; color: #991B1B; }
+	</style>
+
+	<!-- Modernizr JS -->
+	<script src="js/modernizr-2.6.2.min.js"></script>
+	<!-- FOR IE9 below -->
+	<!--[if lt IE 9]>
+	<script src="js/respond.min.js"></script>
+	<![endif]-->
+
+	</head>
+	<body>
+	<header role="banner" id="fh5co-header">
+		<div class="fluid-container">
+			<nav class="navbar navbar-default">
+				<div class="navbar-header">
+					<!-- Mobile Toggle Menu Button -->
+					<a href="#" class="js-fh5co-nav-toggle fh5co-nav-toggle" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar"><i></i></a>
+					<a class="navbar-brand" href="#"><i class="icon-location"></i> WhereIsMyBus</a> 
+				</div>
+				<div id="navbar" class="navbar-collapse collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li class="active"><a href="#" data-nav-section="home"><span>Home</span></a></li>
+						<li><a href="#" data-nav-section="tracking"><span>Live Tracking</span></a></li>
+						<li><a href="#" data-nav-section="features"><span>Features</span></a></li>
+						<li><a href="#" data-nav-section="services"><span>Services</span></a></li>
+						<li><a href="#" data-nav-section="coverage"><span>Coverage</span></a></li>
+						<li><a href="#" data-nav-section="contact"><span>Contact</span></a></li>
+						<li class="call-to-action"><a href="#" onclick="startTracking()"><span>Track Now</span></a></li>
+					</ul>
+				</div>
+			</nav>
+	  </div>
+	</header>
+
+	<section id="fh5co-home" data-section="home" style="background-image: url(images/full_image_3.jpg);" data-stellar-background-ratio="0.5">
+		<div class="gradient"></div>
+		<div class="container">
+			<div class="text-wrap">
+				<div class="text-inner">
+					<div class="row">
+						<div class="col-md-8 col-md-offset-2">
+							<h1 class="to-animate">WhereIsMyBus India - Real-time Bus Tracking</h1>
+							<h2 class="to-animate">Never miss your bus again! Track buses in real-time across India with crowd detection technology. <br> Covering <span style="color: #3B82F6; font-weight: bold;">BMTC, KSRTC, APSRTC</span> and more transit systems.</h2>
+							<div class="call-to-action">
+								<a href="#" class="demo to-animate" onclick="startTracking()">Start Tracking</a>
+								<a href="#" class="download to-animate" data-nav-section="features">Learn More</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Search Section -->
+	<div class="search-container">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2">
+					<div class="text-center">
+						<h3 style="color: white; margin-bottom: 30px;">Search for Bus Routes or Stops</h3>
+						<div class="input-group" style="margin-bottom: 20px;">
+							<input type="text" class="form-control" id="busSearchInput" placeholder="Enter route number, bus stop name, or destination..." style="height: 50px; font-size: 16px;">
+							<span class="input-group-btn">
+								<button class="btn btn-primary" type="button" onclick="searchBus()" style="height: 50px; padding: 0 30px;">
+									<i class="icon-search"></i> Search
+								</button>
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<section id="fh5co-tracking" data-section="tracking">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 section-heading text-center">
+					<h2 class="to-animate">Live Bus Tracking</h2>
+					<div class="row">
+						<div class="col-md-8 col-md-offset-2 subtext to-animate">
+							<h3>Track your bus in real-time and see crowd levels before you board</h3>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="container" style="margin-top: 40px;">
+			<div class="row">
+				<!-- Route Selection Panel -->
+				<div class="col-md-4">
+					<div class="bus-info-panel">
+						<h4><i class="icon-direction"></i> Popular Routes</h4>
+						<div id="busRoutesList">
+							<!-- Routes will be populated by JavaScript -->
+						</div>
+					</div>
+					
+					<div class="bus-info-panel">
+						<h4><i class="icon-clock"></i> Live Schedule</h4>
+						<div id="busSchedule">
+							<!-- Schedule will be populated by JavaScript -->
+						</div>
+					</div>
+				</div>
+				
+				<!-- Map Container -->
+				<div class="col-md-8">
+					<div class="bus-info-panel">
+						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+							<h4><i class="icon-location"></i> Live Map</h4>
+							<div>
+								<span class="provider-badge provider-bmtc">BMTC</span>
+								<span class="provider-badge provider-ksrtc">KSRTC</span>
+								<span class="provider-badge provider-apsrtc">APSRTC</span>
+							</div>
+						</div>
+						<div class="bus-map-container" id="busMap">
+							<!-- Map will be initialized here -->
+						</div>
+						<div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+							<div>
+								<span class="crowd-indicator crowd-low"></span>Low Crowd
+								<span class="crowd-indicator crowd-medium" style="margin-left: 15px;"></span>Medium Crowd
+								<span class="crowd-indicator crowd-high" style="margin-left: 15px;"></span>High Crowd
+							</div>
+							<div style="color: #10B981; font-size: 12px;">
+								<i class="icon-refresh"></i> Live Updates
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="fh5co-features" data-section="features">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 section-heading text-center">
+					<h2 class="to-animate">Smart Features</h2>
+					<div class="row">
+						<div class="col-md-8 col-md-offset-2 subtext to-animate">
+							<h3>Advanced technology to make your bus journey seamless and comfortable</h3>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="fh5co-explore">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-8 col-md-push-5 to-animate-2">
+						<div style="text-align: center; padding: 40px;">
+							<i class="icon-location feature-icon"></i>
+							<h3>Real-time GPS Tracking</h3>
+							<p>Know exactly where your bus is with live GPS tracking. No more waiting at stops wondering when the bus will arrive.</p>
+						</div>
+					</div>
+					<div class="col-md-4 col-md-pull-8 to-animate-2">
+						<div class="mt">
+							<h3>Real-time Location Updates</h3>
+							<p>Our advanced GPS tracking system provides accurate, real-time location updates for all buses in our network.</p>
+							<ul class="list-nav">
+								<li><i class="icon-check2"></i>Live GPS coordinates</li>
+								<li><i class="icon-check2"></i>Accurate arrival predictions</li>
+								<li><i class="icon-check2"></i>Route deviation alerts</li>
+								<li><i class="icon-check2"></i>Multi-city coverage</li>
+								<li><i class="icon-check2"></i>24/7 monitoring</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="fh5co-explore fh5co-explore-bg-color">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-8 col-md-pull-1 to-animate-3">
+						<div style="text-align: center; padding: 40px;">
+							<i class="icon-people feature-icon"></i>
+							<h3>Crowd Detection Technology</h3>
+							<p>AI-powered crowd detection helps you avoid overcrowded buses and plan your journey better.</p>
+						</div>
+					</div>
+					<div class="col-md-4 to-animate-3">
+						<div class="mt">
+							<div>
+								<h4><i class="icon-people"></i>Smart Crowd Detection</h4>
+								<p>Advanced AI algorithms analyze passenger density in real-time to provide accurate crowd level information.</p>
+							</div>
+							<div>
+								<h4><i class="icon-graph"></i>Predictive Analytics</h4>
+								<p>Machine learning models predict crowd patterns based on historical data and current trends.</p>
+							</div>
+							<div>
+								<h4><i class="icon-mobile"></i>Mobile Optimized</h4>
+								<p>Responsive design ensures seamless experience across all devices and screen sizes.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Statistics Section -->
+	<div class="getting-started getting-started-1">
+		<div class="container">
+			<div class="row text-center">
+				<div class="col-md-3 to-animate">
+					<div class="stats-counter">50K+</div>
+					<p>Daily Active Users</p>
+				</div>
+				<div class="col-md-3 to-animate">
+					<div class="stats-counter">500+</div>
+					<p>Bus Routes Covered</p>
+				</div>
+				<div class="col-md-3 to-animate">
+					<div class="stats-counter">15</div>
+					<p>Cities Connected</p>
+				</div>
+				<div class="col-md-3 to-animate">
+					<div class="stats-counter">98%</div>
+					<p>Accuracy Rate</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<section id="fh5co-services" data-section="services">
+		<div class="fh5co-services">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12 section-heading text-center">
+						<h2 class="to-animate">Our Services</h2>
+						<div class="row">
+							<div class="col-md-8 col-md-offset-2 subtext">
+								<h3 class="to-animate">Comprehensive bus tracking and information services for better public transportation experience</h3>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="box-services">
+							<i class="icon-clock to-animate-2"></i>
+							<div class="fh5co-post to-animate">
+								<h3>Real-time Schedules</h3>
+								<p>Get accurate, up-to-date bus schedules with real-time delays and cancellation notifications.</p>
+							</div>
+						</div>
+
+						<div class="box-services">
+							<i class="icon-location to-animate-2"></i>
+							<div class="fh5co-post to-animate">
+								<h3>Route Planning</h3>
+								<p>Smart route suggestions with multiple options, transfer points, and estimated travel times.</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="box-services">
+							<i class="icon-bell to-animate-2"></i>
+							<div class="fh5co-post to-animate">
+								<h3>Smart Notifications</h3>
+								<p>Receive alerts for bus arrivals, delays, route changes, and service disruptions.</p>
+							</div>
+						</div>
+
+						<div class="box-services">
+							<i class="icon-people to-animate-2"></i>
+							<div class="fh5co-post to-animate">
+								<h3>Crowd Information</h3>
+								<p>AI-powered crowd detection helps you choose less crowded buses for a comfortable journey.</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="box-services">
+							<i class="icon-mobile to-animate-2"></i>
+							<div class="fh5co-post to-animate">
+								<h3>Mobile App</h3>
+								<p>Native mobile apps for iOS and Android with offline maps and cached route information.</p>
+							</div>
+						</div>
+
+						<div class="box-services">
+							<i class="icon-globe to-animate-2"></i>
+							<div class="fh5co-post to-animate">
+								<h3>Multi-city Coverage</h3>
+							<p>Supporting major bus operators across India including BMTC, KSRTC, APSRTC, and more.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="call-to-action text-center to-animate">
+					<a href="#" class="btn btn-learn" onclick="startTracking()">Start Tracking Buses</a>
+				</div>
+			</div>
+		</div>
+	</section>	
+
+	<section id="fh5co-coverage" data-section="coverage">
+		<div class="fh5co-team">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12 section-heading text-center">
+						<h2 class="to-animate">City Coverage</h2>
+						<div class="row">
+							<div class="col-md-8 col-md-offset-2 subtext">
+								<h3 class="to-animate">We're expanding across India to provide comprehensive bus tracking services in major cities</h3>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="team-box text-center to-animate-2">
+							<div class="user"><i class="icon-location" style="font-size: 4rem; color: #3B82F6;"></i></div>
+							<h3>Bangalore</h3>
+							<span class="position">BMTC - Bangalore Metropolitan Transport Corporation</span>
+							<p>Complete coverage of BMTC bus network with real-time tracking of over 300 routes and 6000+ buses across Bangalore metropolitan area.</p>
+							<div style="margin-top: 15px;">
+								<span class="provider-badge provider-bmtc">BMTC Active</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-4">
+						<div class="team-box text-center to-animate-2">
+							<div class="user"><i class="icon-location" style="font-size: 4rem; color: #10B981;"></i></div>
+							<h3>Karnataka State</h3>
+							<span class="position">KSRTC - Karnataka State Road Transport Corporation</span>
+							<p>Comprehensive tracking of KSRTC interstate and intrastate services connecting major cities and towns across Karnataka state.</p>
+							<div style="margin-top: 15px;">
+								<span class="provider-badge provider-ksrtc">KSRTC Active</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-4">
+						<div class="team-box text-center to-animate-2">
+							<div class="user"><i class="icon-location" style="font-size: 4rem; color: #F59E0B;"></i></div>
+							<h3>Andhra Pradesh</h3>
+							<span class="position">APSRTC - Andhra Pradesh State Road Transport Corporation</span>
+							<p>Real-time tracking of APSRTC bus services across Andhra Pradesh including major routes to Hyderabad, Vijayawada, and Visakhapatnam.</p>
+							<div style="margin-top: 15px;">
+								<span class="provider-badge provider-apsrtc">APSRTC Active</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="row" style="margin-top: 40px;">
+					<div class="col-md-4">
+						<div class="team-box text-center to-animate-2">
+							<div class="user"><i class="icon-location" style="font-size: 4rem; color: #8B5CF6;"></i></div>
+							<h3>Tamil Nadu</h3>
+							<span class="position">TNSTC - Tamil Nadu State Transport Corporation</span>
+							<p>Coming soon - Coverage of TNSTC network including Chennai, Coimbatore, Madurai and other major Tamil Nadu cities.</p>
+							<div style="margin-top: 15px;">
+								<span class="provider-badge" style="background-color: #E5E7EB; color: #6B7280;">Coming Soon</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-4">
+						<div class="team-box text-center to-animate-2">
+							<div class="user"><i class="icon-location" style="font-size: 4rem; color: #EF4444;"></i></div>
+							<h3>Mumbai</h3>
+							<span class="position">BEST - Brihanmumbai Electric Supply and Transport</span>
+							<p>Expanding to Mumbai with BEST bus network coverage including local and express services across Mumbai metropolitan region.</p>
+							<div style="margin-top: 15px;">
+								<span class="provider-badge" style="background-color: #E5E7EB; color: #6B7280;">Coming Soon</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-4">
+						<div class="team-box text-center to-animate-2">
+							<div class="user"><i class="icon-location" style="font-size: 4rem; color: #6B7280;"></i></div>
+							<h3>Delhi</h3>
+							<span class="position">DTC - Delhi Transport Corporation</span>
+							<p>Planning coverage of Delhi's extensive bus network including DTC and cluster buses serving the National Capital Territory.</p>
+							<div style="margin-top: 15px;">
+								<span class="provider-badge" style="background-color: #E5E7EB; color: #6B7280;">Planned</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="fh5co-trusted" data-section="trusted">
+		<div class="fh5co-trusted">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12 section-heading text-center">
+						<h2 class="to-animate">Trusted By Transport Authorities</h2>
+						<div class="row">
+							<div class="col-md-8 col-md-offset-2 subtext">
+								<h3 class="to-animate">Official partnerships with major transport corporations</h3>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					 <div class="col-md-2 col-sm-3 col-xs-6 col-sm-offset-0 col-md-offset-1">
+					 	<div class="partner-logo to-animate-2" style="display: flex; align-items: center; justify-content: center; height: 100px;">
+					 		<div style="text-align: center;">
+					 			<div style="font-size: 2rem; color: #3B82F6; font-weight: bold;">BMTC</div>
+					 			<div style="font-size: 12px; color: #6B7280;">Bangalore</div>
+					 		</div>
+					 	</div>
+					 </div>
+				    <div class="col-md-2 col-sm-3 col-xs-6">
+				    	<div class="partner-logo to-animate-2" style="display: flex; align-items: center; justify-content: center; height: 100px;">
+				    		<div style="text-align: center;">
+					 			<div style="font-size: 2rem; color: #10B981; font-weight: bold;">KSRTC</div>
+					 			<div style="font-size: 12px; color: #6B7280;">Karnataka</div>
+					 		</div>
+						</div>
+				    </div>
+				    <div class="col-md-2 col-sm-3 col-xs-6">
+				    	<div class="partner-logo to-animate-2" style="display: flex; align-items: center; justify-content: center; height: 100px;">
+				    		<div style="text-align: center;">
+					 			<div style="font-size: 2rem; color: #F59E0B; font-weight: bold;">APSRTC</div>
+					 			<div style="font-size: 12px; color: #6B7280;">Andhra Pradesh</div>
+					 		</div>
+				    	</div>
+				    </div>
+				    <div class="col-md-2 col-sm-3 col-xs-6">
+				    	<div class="partner-logo to-animate-2" style="display: flex; align-items: center; justify-content: center; height: 100px;">
+				    		<div style="text-align: center;">
+					 			<div style="font-size: 2rem; color: #8B5CF6; font-weight: bold;">TNSTC</div>
+					 			<div style="font-size: 12px; color: #6B7280;">Tamil Nadu</div>
+					 		</div>
+				    	</div>
+				    </div>
+				    <div class="col-md-2 col-sm-12 col-xs-12">
+				    	<div class="partner-logo to-animate-2" style="display: flex; align-items: center; justify-content: center; height: 100px;">
+				    		<div style="text-align: center;">
+					 			<div style="font-size: 2rem; color: #6B7280; font-weight: bold;">More</div>
+					 			<div style="font-size: 12px; color: #6B7280;">Coming Soon</div>
+					 		</div>
+				    	</div>
+				    </div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<div class="getting-started getting-started-2">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-6 to-animate">
+					<h3>Start Tracking Buses Today</h3>
+					<p>Join thousands of commuters who use WhereIsMyBus to make their daily travel more efficient and comfortable.</p>
+				</div>
+				<div class="col-md-6 to-animate-2">
+					<div class="call-to-action text-right">
+						<a href="#" class="sign-up" onclick="startTracking()">Start Tracking Now</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="fh5co-footer" role="contentinfo">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-4 to-animate">
+					<h3 class="section-title">WhereIsMyBus India</h3>
+					<p>Real-time bus tracking and schedule information to help you plan your journey across India. Our mission is to make public transportation more accessible, efficient, and comfortable for everyone.</p>
+					<p class="copy-right">&copy; 2024 WhereIsMyBus India. <br>All Rights Reserved. <br>
+						Built with ❤️ for Indian commuters
+					</p>
+				</div>
+
+				<div class="col-md-4 to-animate">
+					<h3 class="section-title">Contact Information</h3>
+					<ul class="contact-info">
+						<li><i class="icon-map-marker"></i>Bangalore, Karnataka, India</li>
+						<li><i class="icon-phone"></i>+91 9876543210</li>
+						<li><i class="icon-envelope"></i><a href="#">support@whereismybus.in</a></li>
+						<li><i class="icon-globe2"></i><a href="#">www.whereismybus.in</a></li>
+					</ul>
+					<h3 class="section-title">Follow Us</h3>
+					<ul class="social-media">
+						<li><a href="#" class="facebook"><i class="icon-facebook"></i></a></li>
+						<li><a href="#" class="twitter"><i class="icon-twitter"></i></a></li>
+						<li><a href="#" class="dribbble"><i class="icon-instagram"></i></a></li>
+						<li><a href="#" class="github"><i class="icon-linkedin"></i></a></li>
+					</ul>
+				</div>
+				<div class="col-md-4 to-animate">
+					<h3 class="section-title">Get Bus Updates</h3>
+					<form class="contact-form">
+						<div class="form-group">
+							<label for="phone" class="sr-only">Phone Number</label>
+							<input type="tel" class="form-control" id="phone" placeholder="Your Phone Number">
+						</div>
+						<div class="form-group">
+							<label for="city" class="sr-only">City</label>
+							<select class="form-control" id="city">
+								<option>Select Your City</option>
+								<option>Bangalore</option>
+								<option>Mysore</option>
+								<option>Hubli</option>
+								<option>Hyderabad</option>
+								<option>Vijayawada</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="routes" class="sr-only">Favorite Routes</label>
+							<textarea class="form-control" id="routes" rows="3" placeholder="Your frequently used bus routes (optional)"></textarea>
+						</div>
+						<div class="form-group">
+							<input type="submit" id="btn-submit" class="btn btn-send-message btn-md" value="Subscribe for Updates">
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Leaflet JS -->
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+	
+	<!-- jQuery -->
+	<script src="js/jquery.min.js"></script>
+	<!-- jQuery Easing -->
+	<script src="js/jquery.easing.1.3.js"></script>
+	<!-- Bootstrap -->
+	<script src="js/bootstrap.min.js"></script>
+	<!-- Waypoints -->
+	<script src="js/jquery.waypoints.min.js"></script>
+	<!-- Stellar Parallax -->
+	<script src="js/jquery.stellar.min.js"></script>
+	<!-- Owl Carousel -->
+	<script src="js/owl.carousel.min.js"></script>
+	<!-- Main JS (Do not remove) -->
+	<script src="js/main.js"></script>
+
+	<!-- Custom Bus Tracking JavaScript -->
+	<script>
+		// Global variables
+		let map;
+		let busMarkers = [];
+		let routeLayer;
+		let selectedRouteId = null;
+		
+		// Mock data for demonstration
+		const mockRoutes = [
+			{ id: 'bmtc-201', name: '201 - Shivajinagar to Electronic City', provider: 'BMTC', crowdLevel: 'Medium' },
+			{ id: 'bmtc-500', name: '500 - Kempegowda Bus Station to Whitefield', provider: 'BMTC', crowdLevel: 'High' },
+			{ id: 'ksrtc-501', name: '501 - Bangalore to Mysore', provider: 'KSRTC', crowdLevel: 'Low' },
+			{ id: 'bmtc-335', name: '335 - Jayanagar to Hebbal', provider: 'BMTC', crowdLevel: 'Medium' },
+			{ id: 'apsrtc-100', name: '100 - Hyderabad to Vijayawada', provider: 'APSRTC', crowdLevel: 'Low' }
+		];
+		
+		const mockBuses = [
+			{ id: 'bus-1', routeId: 'bmtc-201', lat: 12.9716, lng: 77.5946, crowdLevel: 'Medium', vehicleNumber: 'KA-01-HB-1234' },
+			{ id: 'bus-2', routeId: 'bmtc-500', lat: 12.9626, lng: 77.6419, crowdLevel: 'High', vehicleNumber: 'KA-01-HB-5678' },
+			{ id: 'bus-3', routeId: 'ksrtc-501', lat: 12.9141, lng: 77.6063, crowdLevel: 'Low', vehicleNumber: 'KA-09-HA-9012' },
+			{ id: 'bus-4', routeId: 'bmtc-335', lat: 12.9698, lng: 77.6124, crowdLevel: 'Medium', vehicleNumber: 'KA-01-HB-3456' }
+		];
+		
+		const mockSchedule = [
+			{ time: '09:15 AM', route: '201', status: 'On Time', delay: 0 },
+			{ time: '09:22 AM', route: '500', status: '3 min delay', delay: 3 },
+			{ time: '09:30 AM', route: '335', status: 'On Time', delay: 0 },
+			{ time: '09:45 AM', route: '501', status: '5 min delay', delay: 5 },
+			{ time: '10:00 AM', route: '201', status: 'On Time', delay: 0 }
+		];
+		
+		// Initialize the application
+		function initializeApp() {
+			initializeMap();
+			populateRoutes();
+			populateSchedule();
+			startLiveUpdates();
+		}
+		
+		// Initialize the map
+		function initializeMap() {
+			map = L.map('busMap').setView([12.9716, 77.5946], 12);
+			
+			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				attribution: '© OpenStreetMap contributors'
+			}).addTo(map);
+			
+			// Add buses to map
+			updateBusPositions();
+		}
+		
+		// Populate route list
+		function populateRoutes() {
+			const routesList = document.getElementById('busRoutesList');
+			routesList.innerHTML = '';
+			
+			mockRoutes.forEach(route => {
+				const routeCard = document.createElement('div');
+				routeCard.className = 'bus-route-card';
+				routeCard.onclick = () => selectRoute(route.id);
+				
+				routeCard.innerHTML = `
+					<div style="display: flex; justify-content: space-between; align-items: center;">
+						<div>
+							<div style="font-weight: 600; color: #1F2937;">${route.name}</div>
+							<div style="font-size: 12px; color: #6B7280; margin-top: 5px;">
+								<span class="provider-badge provider-${route.provider.toLowerCase()}">${route.provider}</span>
+							</div>
+						</div>
+						<div>
+							<span class="crowd-indicator crowd-${route.crowdLevel.toLowerCase()}"></span>
+							<span style="font-size: 12px; color: #6B7280;">${route.crowdLevel}</span>
+						</div>
+					</div>
+				`;
+				
+				routesList.appendChild(routeCard);
+			});
+		}
+		
+		// Populate schedule
+		function populateSchedule() {
+			const scheduleDiv = document.getElementById('busSchedule');
+			scheduleDiv.innerHTML = '';
+			
+			mockSchedule.forEach(item => {
+				const scheduleItem = document.createElement('div');
+				scheduleItem.className = 'schedule-item';
+				
+				const delayClass = item.delay === 0 ? 'delay-ontime' : 
+				                 item.delay <= 3 ? 'delay-minor' : 'delay-major';
+				
+				scheduleItem.innerHTML = `
+					<div>
+						<div class="schedule-time">${item.time}</div>
+						<div style="font-size: 12px; color: #6B7280;">Route ${item.route}</div>
+					</div>
+					<div>
+						<span class="delay-indicator ${delayClass}">${item.status}</span>
+					</div>
+				`;
+				
+				scheduleDiv.appendChild(scheduleItem);
+			});
+		}
+		
+		// Update bus positions on map
+		function updateBusPositions() {
+			// Clear existing markers
+			busMarkers.forEach(marker => map.removeLayer(marker));
+			busMarkers = [];
+			
+			// Add new markers
+			mockBuses.forEach(bus => {
+				const crowdColor = bus.crowdLevel === 'Low' ? '#10B981' : 
+				                 bus.crowdLevel === 'Medium' ? '#F59E0B' : '#EF4444';
+				
+				const marker = L.marker([bus.lat, bus.lng], {
+					icon: L.divIcon({
+						html: `<div style="background-color: ${crowdColor}; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px;">BUS</div>`,
+						className: 'bus-marker',
+						iconSize: [35, 15],
+						iconAnchor: [17, 7]
+					})
+				}).addTo(map);
+				
+				marker.bindPopup(`
+					<div style="text-align: center;">
+						<strong>Vehicle: ${bus.vehicleNumber}</strong><br>
+						<span class="crowd-indicator crowd-${bus.crowdLevel.toLowerCase()}"></span>
+						Crowd Level: ${bus.crowdLevel}<br>
+						<small>Route: ${mockRoutes.find(r => r.id === bus.routeId)?.name || 'Unknown'}</small>
+					</div>
+				`);
+				
+				busMarkers.push(marker);
+			});
+		}
+		
+		// Select a route
+		function selectRoute(routeId) {
+			selectedRouteId = routeId;
+			
+			// Update route cards
+			document.querySelectorAll('.bus-route-card').forEach(card => {
+				card.classList.remove('selected');
+			});
+			
+			event.target.closest('.bus-route-card').classList.add('selected');
+			
+			// Focus on route buses
+			const routeBuses = mockBuses.filter(bus => bus.routeId === routeId);
+			if (routeBuses.length > 0) {
+				const group = new L.featureGroup(
+					routeBuses.map(bus => L.marker([bus.lat, bus.lng]))
+				);
+				map.fitBounds(group.getBounds().pad(0.1));
+			}
+		}
+		
+		// Search for buses
+		function searchBus() {
+			const query = document.getElementById('busSearchInput').value.toLowerCase();
+			if (!query) return;
+			
+			// Simple search implementation
+			const matchingRoutes = mockRoutes.filter(route => 
+				route.name.toLowerCase().includes(query) || 
+				route.id.toLowerCase().includes(query)
+			);
+			
+			if (matchingRoutes.length > 0) {
+				selectRoute(matchingRoutes[0].id);
+				// Scroll to tracking section
+				document.querySelector('[data-nav-section="tracking"]').click();
+			} else {
+				alert('No routes found matching your search.');
+			}
+		}
+		
+		// Start tracking (main CTA function)
+		function startTracking() {
+			document.querySelector('[data-nav-section="tracking"]').click();
+			document.getElementById('busSearchInput').focus();
+		}
+		
+		// Simulate live updates
+		function startLiveUpdates() {
+			setInterval(() => {
+				// Simulate bus movement
+				mockBuses.forEach(bus => {
+					bus.lat += (Math.random() - 0.5) * 0.001;
+					bus.lng += (Math.random() - 0.5) * 0.001;
+				});
+				
+				updateBusPositions();
+			}, 10000); // Update every 10 seconds
+		}
+		
+		// Handle search on Enter key
+		document.addEventListener('DOMContentLoaded', function() {
+			const searchInput = document.getElementById('busSearchInput');
+			if (searchInput) {
+				searchInput.addEventListener('keypress', function(e) {
+					if (e.key === 'Enter') {
+						searchBus();
+					}
+				});
+			}
+		});
+		
+		// Initialize the app when page loads
+		document.addEventListener('DOMContentLoaded', function() {
+			// Wait a bit for the map container to be ready
+			setTimeout(initializeApp, 500);
+		});
+	</script>
+
+	</body>
+</html>
