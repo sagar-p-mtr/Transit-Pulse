@@ -276,26 +276,30 @@ function AppContent() {
                 transition={{ duration: 0.3 }}
                 className={isMobile ? 'pb-20' : ''}
               >
-                <LiveTrackingSection
-                  selectedRoute={selectedRoute}
-                  onRouteSelect={handleRouteSelect}
-                  onStopSelect={handleStopSelect}
-                  searchQuery={searchQuery}
-                  isOnline={isOnline}
-                  isDataStale={isDataStale}
-                  user={user}
-                />
+                <ErrorBoundary>
+                  <LiveTrackingSection
+                    selectedRoute={selectedRoute}
+                    onRouteSelect={handleRouteSelect}
+                    onStopSelect={handleStopSelect}
+                    searchQuery={searchQuery}
+                    isOnline={isOnline}
+                    isDataStale={isDataStale}
+                    user={user}
+                  />
+                </ErrorBoundary>
 
                 {/* Floating Feature Menu - Elegant Radial Menu replacing 7 FAB buttons */}
-                <FloatingFeatureMenu
-                  onOpenAIAssistant={() => setShowAIAssistant(!showAIAssistant)}
-                  onOpen3DView={() => setShow3DVisualization(true)}
-                  onOpenSocial={() => setShowSocialFeatures(true)}
-                  onOpenFareCalculator={() => setShowFareCalculator(true)}
-                  onOpenBusBuddy={() => setShowBusBuddy(true)}
-                  onOpenWeatherRoutes={() => setShowWeatherRoutes(true)}
-                  onOpenCrowdPrediction={() => setShowCrowdPrediction(true)}
-                />
+                <ErrorBoundary fallback={<div className="fixed bottom-6 right-6 p-3 bg-red-500 text-white rounded-full shadow-lg text-xs">Menu Error</div>}>
+                  <FloatingFeatureMenu
+                    onOpenAIAssistant={() => setShowAIAssistant(!showAIAssistant)}
+                    onOpen3DView={() => setShow3DVisualization(true)}
+                    onOpenSocial={() => setShowSocialFeatures(true)}
+                    onOpenFareCalculator={() => setShowFareCalculator(true)}
+                    onOpenBusBuddy={() => setShowBusBuddy(true)}
+                    onOpenWeatherRoutes={() => setShowWeatherRoutes(true)}
+                    onOpenCrowdPrediction={() => setShowCrowdPrediction(true)}
+                  />
+                </ErrorBoundary>
               </motion.div>
             )}
 
@@ -384,48 +388,60 @@ function AppContent() {
 
         {/* Phase 3 Advanced Modals 🚀 */}
         {showAIAssistant && (
-          <AIAssistant 
-            isOpen={showAIAssistant}
-            onClose={() => setShowAIAssistant(false)} 
-          />
+          <ErrorBoundary>
+            <AIAssistant
+              isOpen={showAIAssistant}
+              onClose={() => setShowAIAssistant(false)}
+            />
+          </ErrorBoundary>
         )}
 
         {show3DVisualization && (
-          <Bus3DVisualization 
-            busId="KA-01-1234"
-            crowdLevel="Medium"
-            onClose={() => setShow3DVisualization(false)} 
-          />
+          <ErrorBoundary>
+            <Bus3DVisualization
+              busId="KA-01-1234"
+              crowdLevel="Medium"
+              onClose={() => setShow3DVisualization(false)}
+            />
+          </ErrorBoundary>
         )}
 
         {showSocialFeatures && (
-          <SocialFeatures 
-            userId="demo-user"
-            onClose={() => setShowSocialFeatures(false)} 
-          />
+          <ErrorBoundary>
+            <SocialFeatures
+              userId="demo-user"
+              onClose={() => setShowSocialFeatures(false)}
+            />
+          </ErrorBoundary>
         )}
 
         {/* NEW: Phase 4 Unique Features Modals 🌟 */}
         {showBusBuddy && (
-          <BusBuddyAI 
-            userId="00000000-0000-0000-0000-000000000001"
-            onClose={() => setShowBusBuddy(false)} 
-          />
+          <ErrorBoundary>
+            <BusBuddyAI
+              userId="00000000-0000-0000-0000-000000000001"
+              onClose={() => setShowBusBuddy(false)}
+            />
+          </ErrorBoundary>
         )}
 
         {showWeatherRoutes && (
-          <WeatherAwareRoutes 
-            city="Bangalore"
-            onClose={() => setShowWeatherRoutes(false)} 
-          />
+          <ErrorBoundary>
+            <WeatherAwareRoutes
+              city="Bangalore"
+              onClose={() => setShowWeatherRoutes(false)}
+            />
+          </ErrorBoundary>
         )}
 
       {showCrowdPrediction && (
-        <CrowdPredictionWidget 
-          routeId="bmtc-335E"
-          routeName="Kengeri to Whitefield"
-          onClose={() => setShowCrowdPrediction(false)} 
-        />
+        <ErrorBoundary>
+          <CrowdPredictionWidget
+            routeId="bmtc-335E"
+            routeName="Kengeri to Whitefield"
+            onClose={() => setShowCrowdPrediction(false)}
+          />
+        </ErrorBoundary>
       )}
       
 

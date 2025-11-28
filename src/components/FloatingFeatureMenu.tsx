@@ -117,23 +117,24 @@ const FloatingFeatureMenu: React.FC<FloatingFeatureMenuProps> = ({
     }
   ];
 
-  // Calculate position for radial menu (semi-circle arc above main button)
+  // Calculate position for radial menu (arc going UP and LEFT to avoid screen edges)
   const getMenuItemPosition = (index: number, total: number) => {
-    const radius = 120; // Distance from main button
-    const startAngle = 180; // Start from left (180 degrees)
-    const endAngle = 360; // End at right (360 degrees)
+    const radius = 85; // Distance from main button (reduced for mobile safety)
+    // Arc from left to top (135 to 225 degrees) - keeps everything visible on all screens
+    const startAngle = 135;  // Top-left diagonal
+    const endAngle = 225;    // Bottom-left (going upward arc)
     const angleRange = endAngle - startAngle;
     const angleStep = angleRange / (total - 1);
     const angle = (startAngle + (index * angleStep)) * (Math.PI / 180);
 
     return {
       x: Math.cos(angle) * radius,
-      y: Math.sin(angle) * radius
+      y: -Math.sin(angle) * radius // Negative to go upward
     };
   };
 
   return (
-    <div className="fixed bottom-24 right-6 z-50">
+    <div className="fixed bottom-20 right-4 md:bottom-24 md:right-6 z-50">
       {/* Menu Items */}
       <AnimatePresence>
         {isExpanded && menuItems.map((item, index) => {
@@ -166,19 +167,21 @@ const FloatingFeatureMenu: React.FC<FloatingFeatureMenuProps> = ({
                 }
               }}
               onClick={item.onClick}
-              className={`absolute p-3 bg-gradient-to-r ${item.gradient} hover:scale-110 text-white rounded-full shadow-lg transition-all group`}
+              className={`absolute p-2 md:p-3 bg-gradient-to-r ${item.gradient} hover:scale-110 text-white rounded-full shadow-lg transition-all group`}
               style={{ bottom: 0, right: 0 }}
-              whileHover={{ scale: 1.15 }}
+              whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               title={item.label}
             >
-              {item.icon}
+              <div className="w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
+                {item.icon}
+              </div>
 
-              {/* Tooltip */}
+              {/* Tooltip - only show on desktop */}
               <motion.div
                 initial={{ opacity: 0, x: 10 }}
                 whileHover={{ opacity: 1, x: 0 }}
-                className="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap bg-gray-900 text-white text-xs px-3 py-1 rounded-lg shadow-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+                className="hidden md:block absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap bg-gray-900 text-white text-xs px-3 py-1 rounded-lg shadow-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 {item.label}
                 <div className="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-l-4 border-l-gray-900" />
@@ -191,12 +194,12 @@ const FloatingFeatureMenu: React.FC<FloatingFeatureMenuProps> = ({
       {/* Main Toggle Button */}
       <motion.button
         onClick={() => setIsExpanded(!isExpanded)}
-        className={`p-5 ${
+        className={`p-3 md:p-4 ${
           isExpanded
             ? 'bg-gradient-to-r from-red-600 to-rose-600'
             : 'bg-gradient-to-r from-blue-600 to-purple-600'
         } text-white rounded-full shadow-2xl transition-all`}
-        whileHover={{ scale: 1.1 }}
+        whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         animate={{
           rotate: isExpanded ? 135 : 0
@@ -214,7 +217,7 @@ const FloatingFeatureMenu: React.FC<FloatingFeatureMenuProps> = ({
               exit={{ rotate: 90, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <X className="h-6 w-6" />
+              <X className="h-5 w-5 md:h-6 md:w-6" />
             </motion.div>
           ) : (
             <motion.div
@@ -224,7 +227,7 @@ const FloatingFeatureMenu: React.FC<FloatingFeatureMenuProps> = ({
               exit={{ rotate: -90, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <Menu className="h-6 w-6" />
+              <Menu className="h-5 w-5 md:h-6 md:w-6" />
             </motion.div>
           )}
         </AnimatePresence>
