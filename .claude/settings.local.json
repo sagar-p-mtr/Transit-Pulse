@@ -3,7 +3,8 @@
     "allow": [
       "Bash(ls:*)",
       "Bash(find:*)",
-      "Bash(head:*)"
+      "Bash(head:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []
