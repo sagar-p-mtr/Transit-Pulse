@@ -40,6 +40,7 @@ import BusBuddyAI from './components/BusBuddyAI';
 import WeatherAwareRoutes from './components/WeatherAwareRoutes';
 import CrowdPredictionWidget from './components/CrowdPredictionWidget';
 import DemoBanner from './components/DemoBanner';
+import FloatingFeatureMenu from './components/FloatingFeatureMenu';
 
 import { initializePWA } from './services/pwa';
 import { useOfflineData } from './hooks/useOfflineSync';
@@ -284,101 +285,17 @@ function AppContent() {
                   isDataStale={isDataStale}
                   user={user}
                 />
-                {/* Floating Action Buttons for Phase 3 Features 🚀 */}
-                <div className="fixed bottom-24 right-6 flex flex-col space-y-3 z-40">
-                  {/* AI Assistant Button */}
-                  <motion.button
-                    onClick={() => setShowAIAssistant(!showAIAssistant)}
-                    className="p-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full shadow-lg transition-all"
-                    aria-label="Open BusGuru"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    title="BusGuru"
-                  >
-                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </motion.button>
 
-                  {/* 3D Visualization Button */}
-                  <motion.button
-                    onClick={() => setShow3DVisualization(true)}
-                    className="p-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-full shadow-lg transition-all"
-                    aria-label="Open 3D Bus View"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    title="3D Bus View"
-                  >
-                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
-                  </motion.button>
-
-                  {/* Social Features Button */}
-                  <motion.button
-                    onClick={() => setShowSocialFeatures(true)}
-                    className="p-4 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white rounded-full shadow-lg transition-all"
-                    aria-label="Open Social Features"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    title="Community & Social"
-                  >
-                    <Users className="h-6 w-6" />
-                  </motion.button>
-
-                  {/* Fare Calculator Button */}
-                  <motion.button
-                    onClick={() => setShowFareCalculator(true)}
-                    className="p-4 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg transition-all"
-                    aria-label="Open fare calculator"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    title="Fare Calculator"
-                  >
-                    <Calculator className="h-6 w-6" />
-                  </motion.button>
-                </div>
-
-                {/* NEW: Phase 4 Unique Features Buttons 🌟 */}
-                <div className="fixed bottom-24 left-6 flex flex-col space-y-3 z-40">
-                  {/* Bus Buddy AI Button */}
-                  <motion.button
-                    onClick={() => setShowBusBuddy(true)}
-                    className="p-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-full shadow-lg transition-all"
-                    aria-label="Open Bus Buddy AI"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    title="Bus Buddy AI - Your Smart Commute Assistant"
-                  >
-                    <span className="text-2xl">🧠</span>
-                  </motion.button>
-
-                  {/* Weather-Aware Routes Button */}
-                  <motion.button
-                    onClick={() => setShowWeatherRoutes(true)}
-                    className="p-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-full shadow-lg transition-all"
-                    aria-label="Open Weather Routes"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    title="Weather-Aware Routes"
-                  >
-                    <span className="text-2xl">🌦️</span>
-                  </motion.button>
-
-        {/* Crowd Prediction Button */}
-        <motion.button
-          onClick={() => setShowCrowdPrediction(true)}
-          className="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-full shadow-lg transition-all"
-          aria-label="Open Crowd Prediction"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          title="AI Crowd Prediction"
-        >
-          <span className="text-2xl">🔮</span>
-        </motion.button>
-        
-
-                </div>
+                {/* Floating Feature Menu - Elegant Radial Menu replacing 7 FAB buttons */}
+                <FloatingFeatureMenu
+                  onOpenAIAssistant={() => setShowAIAssistant(!showAIAssistant)}
+                  onOpen3DView={() => setShow3DVisualization(true)}
+                  onOpenSocial={() => setShowSocialFeatures(true)}
+                  onOpenFareCalculator={() => setShowFareCalculator(true)}
+                  onOpenBusBuddy={() => setShowBusBuddy(true)}
+                  onOpenWeatherRoutes={() => setShowWeatherRoutes(true)}
+                  onOpenCrowdPrediction={() => setShowCrowdPrediction(true)}
+                />
               </motion.div>
             )}
 
