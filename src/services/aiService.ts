@@ -1,5 +1,5 @@
 // OpenRouter AI Service for BMTC Bus Assistant
-const OPENROUTER_API_KEY = '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';
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || '';
 const MODEL = 'meta-llama/llama-3.3-8b-instruct:free';
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
