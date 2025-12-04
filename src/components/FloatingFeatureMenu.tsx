@@ -1,11 +1,21 @@
 /**
- * Floating Feature Menu - Elegant Radial Menu
- * Consolidates all feature buttons into a single expandable menu
+ * Floating Feature Menu - tidy speed-dial with stacked actions.
+ * Replaces the messy FAB cluster with a single expandable sheet.
  */
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Calculator, Menu, X } from 'lucide-react';
+import {
+  Activity,
+  Bot,
+  Box,
+  Calculator,
+  CloudSun,
+  Menu,
+  Sparkles,
+  Users,
+  X
+} from 'lucide-react';
 
 interface FloatingFeatureMenuProps {
   onOpenAIAssistant: () => void;
@@ -20,6 +30,7 @@ interface FloatingFeatureMenuProps {
 interface MenuItem {
   id: string;
   label: string;
+  description: string;
   icon: React.ReactNode;
   onClick: () => void;
   gradient: string;
@@ -40,211 +51,181 @@ const FloatingFeatureMenu: React.FC<FloatingFeatureMenuProps> = ({
     {
       id: 'bus-buddy',
       label: 'Bus Buddy AI',
-      icon: <span className="text-xl">🧠</span>,
+      description: 'Chat with your co-pilot for quick help.',
+      icon: <Bot className="h-5 w-5" strokeWidth={2.4} />,
       onClick: () => {
         onOpenBusBuddy();
         setIsExpanded(false);
       },
-      gradient: 'from-purple-600 to-pink-600'
+      gradient: 'linear-gradient(135deg, #7c3aed, #4f46e5)'
     },
     {
       id: '3d-view',
       label: '3D Seat View',
-      icon: (
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-        </svg>
-      ),
+      description: 'Peek inside before you board.',
+      icon: <Box className="h-5 w-5" strokeWidth={2.4} />,
       onClick: () => {
         onOpen3DView();
         setIsExpanded(false);
       },
-      gradient: 'from-blue-600 to-cyan-600'
+      gradient: 'linear-gradient(135deg, #2563eb, #06b6d4)'
     },
     {
       id: 'crowd-prediction',
       label: 'Crowd Prediction',
-      icon: <span className="text-xl">🔮</span>,
+      description: 'Beat rush-hour with smarter timing.',
+      icon: <Activity className="h-5 w-5" strokeWidth={2.4} />,
       onClick: () => {
         onOpenCrowdPrediction();
         setIsExpanded(false);
       },
-      gradient: 'from-indigo-600 to-purple-600'
+      gradient: 'linear-gradient(135deg, #db2777, #7c3aed)'
     },
     {
       id: 'weather',
       label: 'Weather Routes',
-      icon: <span className="text-xl">🌦️</span>,
+      description: 'Rain-ready paths and safer options.',
+      icon: <CloudSun className="h-5 w-5" strokeWidth={2.4} />,
       onClick: () => {
         onOpenWeatherRoutes();
         setIsExpanded(false);
       },
-      gradient: 'from-blue-600 to-cyan-600'
+      gradient: 'linear-gradient(135deg, #0ea5e9, #10b981)'
     },
     {
       id: 'ai-assistant',
       label: 'BusGuru',
-      icon: (
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      ),
+      description: 'Ask about routes, delays, or shortcuts.',
+      icon: <Sparkles className="h-5 w-5" strokeWidth={2.4} />,
       onClick: () => {
         onOpenAIAssistant();
         setIsExpanded(false);
       },
-      gradient: 'from-purple-600 to-blue-600'
+      gradient: 'linear-gradient(135deg, #7c3aed, #2563eb)'
     },
     {
       id: 'social',
       label: 'Community',
-      icon: <Users className="h-5 w-5" />,
+      description: 'Share quick updates with riders.',
+      icon: <Users className="h-5 w-5" strokeWidth={2.4} />,
       onClick: () => {
         onOpenSocial();
         setIsExpanded(false);
       },
-      gradient: 'from-pink-600 to-rose-600'
+      gradient: 'linear-gradient(135deg, #ec4899, #f43f5e)'
     },
     {
       id: 'fare',
       label: 'Fare Calculator',
-      icon: <Calculator className="h-5 w-5" />,
+      description: 'Check your ticket in a tap.',
+      icon: <Calculator className="h-5 w-5" strokeWidth={2.4} />,
       onClick: () => {
         onOpenFareCalculator();
         setIsExpanded(false);
       },
-      gradient: 'from-green-600 to-emerald-600'
+      gradient: 'linear-gradient(135deg, #10b981, #16a34a)'
     }
   ];
 
-  // Calculate position for radial menu (arc going UP and LEFT to avoid screen edges)
-  const getMenuItemPosition = (index: number, total: number) => {
-    const radius = 85; // Distance from main button (reduced for mobile safety)
-    // Arc from left to top (135 to 225 degrees) - keeps everything visible on all screens
-    const startAngle = 135;  // Top-left diagonal
-    const endAngle = 225;    // Bottom-left (going upward arc)
-    const angleRange = endAngle - startAngle;
-    const angleStep = angleRange / (total - 1);
-    const angle = (startAngle + (index * angleStep)) * (Math.PI / 180);
-
-    return {
-      x: Math.cos(angle) * radius,
-      y: -Math.sin(angle) * radius // Negative to go upward
-    };
-  };
-
   return (
-    <div className="fixed bottom-20 right-4 md:bottom-24 md:right-6 z-50">
-      {/* Menu Items */}
-      <AnimatePresence>
-        {isExpanded && menuItems.map((item, index) => {
-          const position = getMenuItemPosition(index, menuItems.length);
-
-          return (
-            <motion.button
-              key={item.id}
-              initial={{ scale: 0, x: 0, y: 0, opacity: 0 }}
-              animate={{
-                scale: 1,
-                x: position.x,
-                y: position.y,
-                opacity: 1,
-                transition: {
-                  type: 'spring',
-                  stiffness: 260,
-                  damping: 20,
-                  delay: index * 0.05
-                }
-              }}
-              exit={{
-                scale: 0,
-                x: 0,
-                y: 0,
-                opacity: 0,
-                transition: {
-                  duration: 0.2,
-                  delay: (menuItems.length - index - 1) * 0.03
-                }
-              }}
-              onClick={item.onClick}
-              className={`absolute p-2 md:p-3 bg-gradient-to-r ${item.gradient} hover:scale-110 text-white rounded-full shadow-lg transition-all group`}
-              style={{ bottom: 0, right: 0 }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              title={item.label}
-            >
-              <div className="w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
-                {item.icon}
-              </div>
-
-              {/* Tooltip - only show on desktop */}
-              <motion.div
-                initial={{ opacity: 0, x: 10 }}
-                whileHover={{ opacity: 1, x: 0 }}
-                className="hidden md:block absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap bg-gray-900 text-white text-xs px-3 py-1 rounded-lg shadow-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                {item.label}
-                <div className="absolute left-full top-1/2 -translate-y-1/2 -ml-1 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-l-4 border-l-gray-900" />
-              </motion.div>
-            </motion.button>
-          );
-        })}
-      </AnimatePresence>
-
-      {/* Main Toggle Button */}
-      <motion.button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className={`p-3 md:p-4 ${
-          isExpanded
-            ? 'bg-gradient-to-r from-red-600 to-rose-600'
-            : 'bg-gradient-to-r from-blue-600 to-purple-600'
-        } text-white rounded-full shadow-2xl transition-all`}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        animate={{
-          rotate: isExpanded ? 135 : 0
-        }}
-        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-        aria-label={isExpanded ? 'Close menu' : 'Open features menu'}
-        title={isExpanded ? 'Close menu' : 'Features'}
-      >
-        <AnimatePresence mode="wait">
-          {isExpanded ? (
-            <motion.div
-              key="close"
-              initial={{ rotate: -90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: 90, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <X className="h-5 w-5 md:h-6 md:w-6" />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="menu"
-              initial={{ rotate: 90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: -90, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Menu className="h-5 w-5 md:h-6 md:w-6" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.button>
-
-      {/* Backdrop for mobile - close menu when clicking outside */}
+    <div className="fixed bottom-20 right-4 md:bottom-24 md:right-6 z-50 flex flex-col items-end gap-2">
       <AnimatePresence>
         {isExpanded && (
           <motion.div
+            key="fab-overlay"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: 0.15 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 -z-10 md:hidden"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-40 bg-black"
             onClick={() => setIsExpanded(false)}
           />
         )}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            key="fab-panel"
+            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="relative z-50 w-[260px] sm:w-[300px]"
+          >
+            <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-gray-200/80 dark:border-gray-700/70 rounded-2xl shadow-2xl shadow-blue-500/10 p-4 space-y-3 max-h-[70vh] overflow-y-auto">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Quick actions
+                  </p>
+                  <p className="text-sm text-gray-700 dark:text-gray-200 truncate">
+                    Jump into the advanced tools
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsExpanded(false)}
+                  className="shrink-0 h-8 w-8 inline-flex items-center justify-center rounded-full border border-gray-200/70 dark:border-gray-700/70 text-gray-500 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                  aria-label="Close quick actions"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2">
+                {menuItems.map(item => (
+                  <button
+                    key={item.id}
+                    onClick={item.onClick}
+                    className="group flex items-center gap-3 w-full text-left px-3 py-3 min-h-[78px] rounded-xl border border-gray-200/80 dark:border-gray-700/70 bg-white/90 dark:bg-gray-800/80 shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-400/70 focus:border-blue-300"
+                  >
+                    <span
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white shadow-lg shadow-black/10 ring-1 ring-black/10"
+                      style={{ backgroundImage: item.gradient }}
+                      aria-hidden="true"
+                    >
+                      {item.icon}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                        {item.label}
+                      </div>
+                      <p className="text-xs text-gray-600 dark:text-gray-300 leading-tight line-clamp-2">
+                        {item.description}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.button
+        onClick={() => setIsExpanded(prev => !prev)}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
+        className={`relative z-50 flex items-center gap-3 px-4 py-3 md:px-5 rounded-full text-white shadow-2xl border border-white/20 transition-all ${
+          isExpanded
+            ? 'bg-gradient-to-r from-rose-600 to-red-600 shadow-rose-500/30'
+            : 'bg-gradient-to-r from-blue-600 to-purple-600 shadow-blue-500/30'
+        }`}
+        aria-expanded={isExpanded}
+        aria-label={isExpanded ? 'Close feature menu' : 'Open feature menu'}
+        title={isExpanded ? 'Close menu' : 'Features'}
+      >
+        <motion.span
+          initial={false}
+          animate={{ opacity: 1, x: 0 }}
+          className="text-sm font-semibold hidden md:inline"
+        >
+          {isExpanded ? 'Close' : 'Quick actions'}
+        </motion.span>
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+          {isExpanded ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </div>
+      </motion.button>
     </div>
   );
 };

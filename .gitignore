@@ -7,14 +7,34 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+*.lcov
+.nyc_output
+
+# Production builds
+dist/
+dist-ssr/
+build/
 *.local
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
 .DS_Store
 *.suo
@@ -22,3 +42,92 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Firebase
+.firebase/
+.firebaserc
+firebase-debug.log
+firestore-debug.log
+database-debug.log
+firestore.indexes.json
+firestore.rules
+storage.rules
+firebase.json
+.runtimeconfig.json
+
+# Firebase Admin SDK
+**/serviceAccountKey.json
+**/firebase-adminsdk-*.json
+backend/config/serviceAccountKey.json
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+backend/data/*.db
+backend/data/*.sqlite
+
+# Cache
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist
+.temp
+.serverless/
+
+# OS
+Thumbs.db
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build artifacts
+*.tsbuildinfo
+
+# Debug
+debug/
+*.pid
+*.seed
+*.pid.lock
+
+# Redis dump
+dump.rdb
+
+# Archives (keep these in archive folder only)
+*.zip
+*.tar.gz
+*.rar
+
+# Personal notes
+NOTES.md
+TODO.md
+PERSONAL_*.md
+
+# Sensitive data
+secrets/
+private/
+credentials/
+
+# Local testing
+local-tests/
+scratch/
