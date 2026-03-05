@@ -131,3 +131,5 @@ credentials/
 # Local testing
 local-tests/
 scratch/
+
+.vercel

@@ -29,6 +29,40 @@ const BusBuddyAI: React.FC<BusBuddyAIProps> = ({ userId, onClose }) => {
   const [aiSuggestion, setAiSuggestion] = useState<string>('');
   const [chatInput, setChatInput] = useState('');
   const [chatHistory, setChatHistory] = useState<Array<{role: 'user' | 'ai', message: string}>>([]);
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number, address?: string} | null>(null);
+
+  // Get user's current location
+  const getCurrentLocation = (): Promise<{lat: number, lng: number}> => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Geolocation not supported'));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => reject(error),
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    });
+  };
+
+  // Reverse geocode to get address from coordinates
+  const getAddressFromCoords = async (lat: number, lng: number): Promise<string> => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+      );
+      const data = await response.json();
+      return data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    } catch {
+      return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    }
+  };
 
   useEffect(() => {
     loadData();
@@ -79,8 +113,37 @@ const BusBuddyAI: React.FC<BusBuddyAIProps> = ({ userId, onClose }) => {
     setLoading(true);
 
     try {
+      // Check if user is asking about their location
+      const locationKeywords = [
+        'where am i', 'where i am', 'where i m', 'where im',
+        'my location', 'current location', 'currently now', 'currently',
+        'dont know', "don't know", 'i dont know', "i don't know",
+        'which area', 'which place', 'which stop', 'which bus stop',
+        'nearby', 'near me', 'nearest', 'around me',
+        'lost', 'find me', 'locate me', 'gps'
+      ];
+      const isLocationQuery = locationKeywords.some(keyword => userMessage.toLowerCase().includes(keyword));
+
+      let messageToSend = userMessage;
+
+      if (isLocationQuery) {
+        try {
+          setChatHistory(prev => [...prev, { role: 'ai', message: 'Getting your location...' }]);
+          const coords = await getCurrentLocation();
+          const address = await getAddressFromCoords(coords.lat, coords.lng);
+          setUserLocation({ ...coords, address });
+          
+          // Remove the "Getting your location..." message and add context
+          setChatHistory(prev => prev.filter(msg => msg.message !== 'Getting your location...'));
+          messageToSend = `User is asking about their location. Their GPS coordinates are: ${coords.lat}, ${coords.lng}. Address: ${address}. Original question: ${userMessage}. Please tell them where they are and suggest nearby bus stops or routes.`;
+        } catch (locError) {
+          console.error('Location error:', locError);
+          messageToSend = userMessage + " (Note: Could not get GPS location - user may need to enable location permissions)";
+        }
+      }
+
       // Use frontend AI service directly (OpenRouter API)
-      const aiResponse = await aiService.sendMessage(userMessage);
+      const aiResponse = await aiService.sendMessage(messageToSend);
       setChatHistory(prev => [...prev, { role: 'ai', message: aiResponse }]);
     } catch (error) {
       console.error('Error in AI chat:', error);
@@ -348,6 +411,30 @@ const BusBuddyAI: React.FC<BusBuddyAIProps> = ({ userId, onClose }) => {
                         className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         disabled={loading}
                       />
+                      <button
+                        onClick={async () => {
+                          setLoading(true);
+                          try {
+                            const coords = await getCurrentLocation();
+                            const address = await getAddressFromCoords(coords.lat, coords.lng);
+                            setUserLocation({ ...coords, address });
+                            setChatHistory(prev => [...prev, { role: 'user', message: '📍 Shared my location' }]);
+                            const aiResponse = await aiService.sendMessage(
+                              `User shared their GPS location: ${coords.lat}, ${coords.lng}. Address: ${address}. Tell them exactly where they are and suggest nearby BMTC bus stops or routes they can take.`
+                            );
+                            setChatHistory(prev => [...prev, { role: 'ai', message: aiResponse }]);
+                          } catch (err) {
+                            setChatHistory(prev => [...prev, { role: 'ai', message: 'Could not get your location. Please enable location permissions in your browser.' }]);
+                          } finally {
+                            setLoading(false);
+                          }
+                        }}
+                        disabled={loading}
+                        className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
+                        title="Share your location"
+                      >
+                        📍
+                      </button>
                       <button
                         onClick={handleChatSubmit}
                         disabled={loading || !chatInput.trim()}

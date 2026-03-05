@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { MapPin, Users, Bus as BusIcon } from 'lucide-react';
+import { MapPin, Users, Bus as BusIcon, Navigation } from 'lucide-react';
 import bmtcApi, { BMTCBus, BMTCStop } from '../services/bmtcApi';
 import otherBusApi, { OtherBus } from '../services/otherBusApi';
 import { socket, initializeSocketListeners } from '../services/api';
@@ -30,6 +30,40 @@ const BusRouteMap: React.FC<BusRouteMapProps> = ({ selectedRoute, onStopSelect }
   });
   const [usingFallbackData, setUsingFallbackData] = useState(false);
   const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [userLocation, setUserLocation] = useState<google.maps.LatLngLiteral | null>(null);
+  const [locatingUser, setLocatingUser] = useState(false);
+
+  // Get user's current location and center map
+  const handleLocateUser = useCallback(() => {
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by your browser');
+      return;
+    }
+
+    setLocatingUser(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const userPos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        setUserLocation(userPos);
+        setMapCenter(userPos);
+        setMapZoom(15);
+        if (map) {
+          map.panTo(userPos);
+          map.setZoom(15);
+        }
+        setLocatingUser(false);
+      },
+      (error) => {
+        console.error('Error getting location:', error);
+        setError('Could not get your location. Please enable location permissions.');
+        setLocatingUser(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, [map]);
 
   // Function to update bus positions from socket events
   const handleBusUpdate = useCallback((data: any) => {
@@ -376,12 +410,26 @@ const BusRouteMap: React.FC<BusRouteMapProps> = ({ selectedRoute, onStopSelect }
         buses={busMarkers}
         stops={stopMarkers}
         routePath={routeData}
+        userLocation={userLocation}
         onMapLoad={handleMapLoad}
         className="w-full h-full"
       />
       
       {/* Map controls */}
       <div className="absolute bottom-4 right-4 flex flex-col space-y-2 z-10">
+        {/* Locate Me Button */}
+        <button 
+          className={`bg-white p-2 rounded-full shadow-md hover:bg-gray-100 border transition-all ${locatingUser ? 'animate-pulse' : ''} ${userLocation ? 'ring-2 ring-blue-500' : ''}`}
+          onClick={handleLocateUser}
+          disabled={locatingUser}
+          title="Find my location"
+        >
+          {locatingUser ? (
+            <div className="h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            <Navigation className={`h-6 w-6 ${userLocation ? 'text-blue-500' : 'text-gray-600'}`} />
+          )}
+        </button>
         <button 
           className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 border"
           onClick={handleZoomIn}

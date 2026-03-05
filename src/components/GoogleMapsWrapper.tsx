@@ -74,6 +74,7 @@ interface GoogleMapProps {
   buses: BusMarkerData[];
   stops: StopMarkerData[];
   routePath?: RouteData;
+  userLocation?: google.maps.LatLngLiteral | null;
   onMapLoad?: (map: google.maps.Map) => void;
   className?: string;
 }
@@ -121,6 +122,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   buses,
   stops,
   routePath,
+  userLocation,
   onMapLoad,
   className = "w-full h-full"
 }) => {
@@ -129,6 +131,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   const [infoWindow] = useState<google.maps.InfoWindow>(new google.maps.InfoWindow());
   const markersRef = useRef<google.maps.Marker[]>([]);
   const polylineRef = useRef<google.maps.Polyline | null>(null);
+  const userMarkerRef = useRef<google.maps.Marker | null>(null);
 
   // Initialize the map
   useEffect(() => {
@@ -330,12 +333,63 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     }
   }, [map, routePath]);
 
+  // Create user location marker
+  useEffect(() => {
+    if (!map) return;
+
+    // Clear existing user marker
+    if (userMarkerRef.current) {
+      userMarkerRef.current.setMap(null);
+      userMarkerRef.current = null;
+    }
+
+    // Add user location marker if location exists
+    if (userLocation) {
+      const userIcon = {
+        url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+          <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" fill="#4285F4" stroke="white" stroke-width="3"/>
+            <circle cx="12" cy="12" r="4" fill="white"/>
+          </svg>
+        `)}`,
+        size: new google.maps.Size(24, 24),
+        anchor: new google.maps.Point(12, 12),
+        scaledSize: new google.maps.Size(24, 24)
+      };
+
+      const marker = new google.maps.Marker({
+        position: userLocation,
+        map,
+        title: 'Your Location',
+        icon: userIcon,
+        zIndex: 2000
+      });
+
+      marker.addListener('click', () => {
+        infoWindow.setContent(`
+          <div style="padding: 8px;">
+            <h3 style="margin: 0; font-weight: bold; color: #1f2937;">Your Location</h3>
+            <p style="margin: 4px 0 0 0; font-size: 12px; color: #6b7280;">
+              ${userLocation.lat.toFixed(6)}, ${userLocation.lng.toFixed(6)}
+            </p>
+          </div>
+        `);
+        infoWindow.open(map, marker);
+      });
+
+      userMarkerRef.current = marker;
+    }
+  }, [map, userLocation, infoWindow]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       clearMarkers();
       if (polylineRef.current) {
         polylineRef.current.setMap(null);
+      }
+      if (userMarkerRef.current) {
+        userMarkerRef.current.setMap(null);
       }
     };
   }, [clearMarkers]);
@@ -386,6 +440,7 @@ const GoogleMapsWrapper: React.FC<GoogleMapsWrapperProps> = ({
   buses,
   stops,
   routePath,
+  userLocation,
   onMapLoad,
   className
 }) => {
@@ -416,6 +471,7 @@ const GoogleMapsWrapper: React.FC<GoogleMapsWrapperProps> = ({
         buses={buses}
         stops={stops}
         routePath={routePath}
+        userLocation={userLocation}
         onMapLoad={onMapLoad}
         className={className}
       />
