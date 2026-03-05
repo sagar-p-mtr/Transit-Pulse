@@ -89,15 +89,11 @@ const BusStopInfo: React.FC<BusStopInfoProps> = ({ stopId, onClose, user }) => {
     switch (provider) {
       case 'BMTC':
         return 'bg-blue-100 text-blue-800';
-      case 'KSRTC':
-        return 'bg-purple-100 text-purple-800';
-      case 'APSRTC':
+      case 'MTC':
         return 'bg-green-100 text-green-800';
-      case 'TNSTC':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'BEST':
-        return 'bg-red-100 text-red-800';
-      case 'DTC':
+      case 'MSRTC':
+        return 'bg-purple-100 text-purple-800';
+      case 'Cluster':
         return 'bg-indigo-100 text-indigo-800';
       default:
         return 'bg-gray-100 text-gray-800';

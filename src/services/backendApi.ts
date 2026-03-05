@@ -61,11 +61,11 @@ export const socket = io(BACKEND_URL, {
 
 // Socket connection management
 socket.on('connect', () => {
-  console.log('✅ Connected to backend WebSocket');
+  console.log('Connected to backend WebSocket');
 });
 
 socket.on('disconnect', () => {
-  console.log('❌ Disconnected from backend');
+  console.log('Disconnected from backend');
 });
 
 socket.on('connect_error', (error) => {

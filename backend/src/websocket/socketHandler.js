@@ -21,7 +21,7 @@ class SocketHandler {
     });
 
     this.io.on('connection', (socket) => {
-      console.log(`✅ Client connected: ${socket.id}`);
+      console.log(`Client connected: ${socket.id}`);
       
       if (socket.userId) {
         this.connectedUsers.set(socket.userId, socket.id);
@@ -30,7 +30,7 @@ class SocketHandler {
       // Subscribe to bus tracking
       socket.on('subscribe:bus', (busId) => {
         socket.join(`bus:${busId}`);
-        console.log(`📍 Subscribed to bus: ${busId}`);
+        console.log(`Subscribed to bus: ${busId}`);
       });
 
       // Subscribe to route tracking
@@ -50,14 +50,14 @@ class SocketHandler {
 
       // Disconnect
       socket.on('disconnect', () => {
-        console.log(`❌ Client disconnected: ${socket.id}`);
+        console.log(`Client disconnected: ${socket.id}`);
         if (socket.userId) {
           this.connectedUsers.delete(socket.userId);
         }
       });
     });
 
-    console.log('✅ WebSocket handler initialized');
+    console.log('WebSocket handler initialized');
   }
 
   emitBusUpdate(busId, data) {

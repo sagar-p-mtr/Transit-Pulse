@@ -1,6 +1,41 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Wrapper, Status } from '@googlemaps/react-wrapper';
 
+// Smooth marker animation function
+const animateMarker = (
+  marker: google.maps.Marker,
+  fromPos: google.maps.LatLng,
+  toPos: google.maps.LatLng,
+  duration: number = 1000
+) => {
+  const startTime = Date.now();
+  const startLat = fromPos.lat();
+  const startLng = fromPos.lng();
+  const endLat = toPos.lat();
+  const endLng = toPos.lng();
+
+  const animate = () => {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    
+    // Easing function for smooth animation
+    const easeProgress = progress < 0.5
+      ? 2 * progress * progress
+      : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+    const lat = startLat + (endLat - startLat) * easeProgress;
+    const lng = startLng + (endLng - startLng) * easeProgress;
+
+    marker.setPosition({ lat, lng });
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    }
+  };
+
+  requestAnimationFrame(animate);
+};
+
 // Interface for bus marker data
 interface BusMarkerData {
   id: string;
@@ -114,7 +149,12 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         zoomControl: true,
         zoomControlOptions: {
           position: google.maps.ControlPosition.RIGHT_BOTTOM
-        }
+        },
+        // Performance optimizations
+        gestureHandling: 'greedy',
+        clickableIcons: false,
+        disableDefaultUI: false,
+        backgroundColor: '#f3f4f6'
       });
       
       setMap(newMap);
@@ -136,60 +176,91 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     markersRef.current = [];
   }, []);
 
-  // Create bus markers
+  // Create bus markers with smooth animation
   useEffect(() => {
     if (!map) return;
 
-    // Clear existing markers
-    clearMarkers();
+    // Debounce marker updates
+    const timeoutId = setTimeout(() => {
+      const existingMarkers = new Map(
+        markersRef.current.map(m => [m.getTitle(), m])
+      );
 
-    // Add bus markers
-    buses.forEach(bus => {
-      const marker = new google.maps.Marker({
-        position: bus.position,
-        map,
-        title: bus.title,
-        icon: createBusIcon(bus.crowdLevel),
-        zIndex: 1000
-      });
+      // Add or update bus markers with smooth transition
+      buses.forEach(bus => {
+        const existingMarker = existingMarkers.get(bus.title);
+        
+        if (existingMarker) {
+          // Animate existing marker to new position
+          const currentPos = existingMarker.getPosition();
+          const newPos = new google.maps.LatLng(bus.position.lat, bus.position.lng);
+          
+          if (currentPos && !currentPos.equals(newPos)) {
+            // Smooth animation from old position to new position
+            animateMarker(existingMarker, currentPos, newPos, 1000);
+          }
+          
+          // Update icon if crowd level changed
+          existingMarker.setIcon(createBusIcon(bus.crowdLevel));
+          existingMarkers.delete(bus.title);
+        } else {
+          // Create new marker
+          const marker = new google.maps.Marker({
+            position: bus.position,
+            map,
+            title: bus.title,
+            icon: createBusIcon(bus.crowdLevel),
+            zIndex: 1000,
+            animation: google.maps.Animation.DROP
+          });
 
-      // Create info window content
-      const getCrowdLevelColor = (level: string) => {
-        switch (level) {
-          case 'Low':
-            return 'background-color: #10b981; color: white;';
-          case 'Medium':
-            return 'background-color: #f59e0b; color: white;';
-          case 'High':
-            return 'background-color: #ef4444; color: white;';
-          default:
-            return 'background-color: #6b7280; color: white;';
+          // Create info window content
+          const getCrowdLevelColor = (level: string) => {
+            switch (level) {
+              case 'Low':
+                return 'background-color: #10b981; color: white;';
+              case 'Medium':
+                return 'background-color: #f59e0b; color: white;';
+              case 'High':
+                return 'background-color: #ef4444; color: white;';
+              default:
+                return 'background-color: #6b7280; color: white;';
+            }
+          };
+
+          const content = `
+            <div style="min-width: 200px; padding: 8px;">
+              <h3 style="margin: 0 0 8px 0; font-weight: bold; color: #1f2937;">${bus.routeName || 'Unknown Route'}</h3>
+              <p style="margin: 4px 0; color: #6b7280;">Bus: ${bus.vehicleNumber || 'N/A'}</p>
+              <p style="margin: 4px 0; color: #6b7280;">Provider: ${bus.provider || 'Unknown'}</p>
+              <div style="margin: 8px 0;">
+                <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; ${getCrowdLevelColor(bus.crowdLevel || 'Medium')}">
+                  👥 ${bus.crowdLevel || 'Medium'} (${bus.crowdPercentage || 50}%)
+                </span>
+              </div>
+              <p style="margin: 4px 0; font-size: 11px; color: #9ca3af;">
+                Last updated: ${bus.lastUpdated ? new Date(bus.lastUpdated).toLocaleTimeString() : 'Unknown'}
+              </p>
+            </div>
+          `;
+
+          marker.addListener('click', () => {
+            infoWindow.setContent(content);
+            infoWindow.open(map, marker);
+          });
+
+          markersRef.current.push(marker);
         }
-      };
-
-      const content = `
-        <div style="min-width: 200px; padding: 8px;">
-          <h3 style="margin: 0 0 8px 0; font-weight: bold; color: #1f2937;">${bus.routeName || 'Unknown Route'}</h3>
-          <p style="margin: 4px 0; color: #6b7280;">Bus: ${bus.vehicleNumber || 'N/A'}</p>
-          <p style="margin: 4px 0; color: #6b7280;">Provider: ${bus.provider || 'Unknown'}</p>
-          <div style="margin: 8px 0;">
-            <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; ${getCrowdLevelColor(bus.crowdLevel || 'Medium')}">
-              👥 ${bus.crowdLevel || 'Medium'} (${bus.crowdPercentage || 50}%)
-            </span>
-          </div>
-          <p style="margin: 4px 0; font-size: 11px; color: #9ca3af;">
-            Last updated: ${bus.lastUpdated ? new Date(bus.lastUpdated).toLocaleTimeString() : 'Unknown'}
-          </p>
-        </div>
-      `;
-
-      marker.addListener('click', () => {
-        infoWindow.setContent(content);
-        infoWindow.open(map, marker);
       });
 
-      markersRef.current.push(marker);
-    });
+      // Remove markers that no longer exist
+      existingMarkers.forEach(marker => {
+        marker.setMap(null);
+        const index = markersRef.current.indexOf(marker);
+        if (index > -1) {
+          markersRef.current.splice(index, 1);
+        }
+      });
 
     // Add stop markers
     stops.forEach(stop => {
@@ -229,7 +300,9 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 
       markersRef.current.push(marker);
     });
+    }, 100); // 100ms debounce
 
+    return () => clearTimeout(timeoutId);
   }, [map, buses, stops, clearMarkers, infoWindow]);
 
   // Create route polyline
@@ -300,20 +373,6 @@ const MapError: React.FC<{ error: Error }> = ({ error }) => (
   </div>
 );
 
-// Render function for Google Maps wrapper
-const render = (status: Status): React.ReactElement => {
-  switch (status) {
-    case Status.LOADING:
-      return <MapLoading />;
-    case Status.FAILURE:
-      return <MapError error={new Error('Failed to load Google Maps')} />;
-    case Status.SUCCESS:
-      return <GoogleMap center={{ lat: 12.9716, lng: 77.5946 }} zoom={12} buses={[]} stops={[]} />;
-    default:
-      return <div />;
-  }
-};
-
 // Main wrapper component with Google Maps API
 interface GoogleMapsWrapperProps extends Omit<GoogleMapProps, 'onMapLoad'> {
   apiKey?: string;
@@ -338,13 +397,18 @@ const GoogleMapsWrapper: React.FC<GoogleMapsWrapperProps> = ({
     );
   }
 
+  // Render function for status handling
+  const renderStatus = (status: Status): React.ReactElement => {
+    if (status === Status.LOADING) return <MapLoading />;
+    if (status === Status.FAILURE) return <MapError error={new Error('Failed to load Google Maps. Please check your API key and internet connection.')} />;
+    return <></>;
+  };
+
   return (
     <Wrapper 
       apiKey={finalApiKey}
-      render={render}
+      render={renderStatus}
       libraries={['places']}
-      language={import.meta.env.VITE_GOOGLE_MAPS_LANGUAGE || 'en'}
-      region={import.meta.env.VITE_GOOGLE_MAPS_REGION || 'IN'}
     >
       <GoogleMap
         center={center}

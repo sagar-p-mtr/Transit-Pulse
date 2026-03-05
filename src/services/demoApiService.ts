@@ -44,7 +44,8 @@ class DemoApiService {
     return this.withFallback(
       async () => {
         // This would be your real API call
-        const response = await fetch('https://bmtc-api.onrender.com/api/buses');
+        // Using mock data - external API removed
+        throw new Error('Using mock data');
         if (!response.ok) throw new Error('API failed');
         const data = await response.json();
         
@@ -68,7 +69,8 @@ class DemoApiService {
   async getRoutes(): Promise<MockRoute[]> {
     return this.withFallback(
       async () => {
-        const response = await fetch('https://bmtc-api.onrender.com/api/routes');
+        // Using mock data - external API removed
+        throw new Error('Using mock data');
         if (!response.ok) throw new Error('API failed');
         const data = await response.json();
         
@@ -89,7 +91,8 @@ class DemoApiService {
   async getBusByRoute(routeId: string): Promise<MockBus[]> {
     return this.withFallback(
       async () => {
-        const response = await fetch(`https://bmtc-api.onrender.com/api/routes/${routeId}/buses`);
+        // Using mock data - external API removed
+        throw new Error('Using mock data');
         if (!response.ok) throw new Error('API failed');
         const data = await response.json();
         
@@ -113,13 +116,13 @@ class DemoApiService {
   enableDemoMode(): void {
     this.fallbackEnabled = true;
     mockDataService.enableDemoMode();
-    console.log('🎯 Demo mode: All API calls will use mock data');
+    console.log('Demo mode: All API calls will use mock data');
   }
 
   disableDemoMode(): void {
     this.fallbackEnabled = false;
     mockDataService.disableDemoMode();
-    console.log('📡 Live mode: Will attempt real API calls');
+    console.log('Live mode: Will attempt real API calls');
   }
 
   // Quick demo data access
@@ -157,5 +160,5 @@ if (typeof window !== 'undefined') {
     getData: () => demoApiService.getDemoData()
   };
   
-  console.log('🚌 Demo API Service loaded! Use window.demoAPI to control demo mode');
+  console.log('Demo API Service loaded! Use window.demoAPI to control demo mode');
 }

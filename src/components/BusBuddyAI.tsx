@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import busBuddyApi, { CommuteSuggestion, CommutePattern, UserPreferences } from '../services/busBuddyApi';
+import aiService from '../services/aiService';
 
 interface BusBuddyAIProps {
   userId: string;
@@ -58,13 +59,9 @@ const BusBuddyAI: React.FC<BusBuddyAIProps> = ({ userId, onClose }) => {
   const loadAISuggestion = async () => {
     setLoading(true);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-      const response = await fetch(`${API_URL}/bus-buddy/ai-suggestion/${userId}`);
-      const result = await response.json();
-      
-      if (result.success && result.data.suggestion) {
-        setAiSuggestion(result.data.suggestion);
-      }
+      // Use frontend AI service directly
+      const suggestion = await aiService.sendMessage('Give me a quick commute tip for Bangalore buses today. Keep it short.');
+      setAiSuggestion(suggestion);
     } catch (error) {
       console.error('Error loading AI suggestion:', error);
       setAiSuggestion('AI suggestion temporarily unavailable. Please try again.');
@@ -82,19 +79,9 @@ const BusBuddyAI: React.FC<BusBuddyAIProps> = ({ userId, onClose }) => {
     setLoading(true);
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-      const response = await fetch(`${API_URL}/bus-buddy/ai-chat/${userId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage })
-      });
-      const result = await response.json();
-      
-      if (result.success && result.data.aiSuggestion) {
-        setChatHistory(prev => [...prev, { role: 'ai', message: result.data.aiSuggestion }]);
-      } else {
-        setChatHistory(prev => [...prev, { role: 'ai', message: 'Sorry, I couldn\'t process that. Please try again.' }]);
-      }
+      // Use frontend AI service directly (OpenRouter API)
+      const aiResponse = await aiService.sendMessage(userMessage);
+      setChatHistory(prev => [...prev, { role: 'ai', message: aiResponse }]);
     } catch (error) {
       console.error('Error in AI chat:', error);
       setChatHistory(prev => [...prev, { role: 'ai', message: 'Error connecting to AI. Please try again.' }]);

@@ -16,7 +16,7 @@ const CoverageSection: React.FC = () => {
       routes: 120,
       buses: 800,
       coverage: 90,
-      operators: ["KSRTC", "City Bus"],
+      operators: ["City Bus"],
       status: "full"
     },
     {
@@ -32,7 +32,7 @@ const CoverageSection: React.FC = () => {
       routes: 95,
       buses: 650,
       coverage: 88,
-      operators: ["KSRTC", "Private"],
+      operators: ["Private"],
       status: "full"
     },
     {
@@ -56,28 +56,28 @@ const CoverageSection: React.FC = () => {
   const stateRoutes = [
     {
       route: "Bangalore - Mysore",
-      operator: "KSRTC",
+      operator: "City Bus",
       frequency: "Every 30 mins",
       distance: "150 km",
       buses: 45
     },
     {
       route: "Bangalore - Hubli",
-      operator: "KSRTC/NWKRTC",
+      operator: "NWKRTC",
       frequency: "Every 45 mins",
       distance: "410 km",
       buses: 32
     },
     {
       route: "Bangalore - Mangalore",
-      operator: "KSRTC",
+      operator: "Private",
       frequency: "Every 60 mins",
       distance: "350 km",
       buses: 28
     },
     {
       route: "Mysore - Hassan",
-      operator: "KSRTC",
+      operator: "City Bus",
       frequency: "Every 45 mins",
       distance: "118 km",
       buses: 20

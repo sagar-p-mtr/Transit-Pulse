@@ -105,10 +105,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartTracking }) => {
             
             <div className="flex flex-wrap justify-center gap-4 mb-12">
               <span className="bg-cyan-500 px-4 py-2 rounded-full text-sm font-semibold shadow-lg">BMTC</span>
-              <span className="bg-emerald-500 px-4 py-2 rounded-full text-sm font-semibold shadow-lg">KSRTC</span>
-              <span className="bg-amber-500 px-4 py-2 rounded-full text-sm font-semibold shadow-lg">APSRTC</span>
-              <span className="bg-violet-500 px-4 py-2 rounded-full text-sm font-semibold shadow-lg">TNSTC</span>
-              <span className="bg-rose-500 px-4 py-2 rounded-full text-sm font-semibold shadow-lg">More...</span>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">

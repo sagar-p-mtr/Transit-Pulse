@@ -130,52 +130,52 @@ export class FirebaseMigration {
 
   // Populate routes collection
   async populateRoutes(): Promise<void> {
-    console.log('🚌 Populating routes...');
+    console.log('Populating routes...');
     const routesCollection = collection(db, 'routes');
     
     for (const route of sampleRoutes) {
       try {
         await addDoc(routesCollection, route);
-        console.log(`✅ Added route: ${route.route_number}`);
+        console.log(`Added route: ${route.route_number}`);
       } catch (error) {
-        console.error(`❌ Error adding route ${route.route_number}:`, error);
+        console.error(`Error adding route ${route.route_number}:`, error);
       }
     }
   }
 
   // Populate stops collection
   async populateStops(): Promise<void> {
-    console.log('🏢 Populating stops...');
+    console.log('Populating stops...');
     const stopsCollection = collection(db, 'stops');
     
     for (const stop of sampleStops) {
       try {
         await addDoc(stopsCollection, stop);
-        console.log(`✅ Added stop: ${stop.stop_name}`);
+        console.log(`Added stop: ${stop.stop_name}`);
       } catch (error) {
-        console.error(`❌ Error adding stop ${stop.stop_name}:`, error);
+        console.error(`Error adding stop ${stop.stop_name}:`, error);
       }
     }
   }
 
   // Populate buses collection
   async populateBuses(): Promise<void> {
-    console.log('🚍 Populating buses...');
+    console.log('Populating buses...');
     const busesCollection = collection(db, 'buses');
     
     for (const bus of sampleBuses) {
       try {
         await addDoc(busesCollection, bus);
-        console.log(`✅ Added bus on route: ${bus.route_number}`);
+        console.log(`Added bus on route: ${bus.route_number}`);
       } catch (error) {
-        console.error(`❌ Error adding bus on route ${bus.route_number}:`, error);
+        console.error(`Error adding bus on route ${bus.route_number}:`, error);
       }
     }
   }
 
   // Run full migration
   async runMigration(): Promise<void> {
-    console.log('🔄 Starting Firebase migration...');
+    console.log('Starting Firebase migration...');
     
     try {
       // Check if data already exists
@@ -186,24 +186,24 @@ export class FirebaseMigration {
       if (!routesExist) {
         await this.populateRoutes();
       } else {
-        console.log('📋 Routes already exist, skipping...');
+        console.log('Routes already exist, skipping...');
       }
 
       if (!stopsExist) {
         await this.populateStops();
       } else {
-        console.log('🏢 Stops already exist, skipping...');
+        console.log('Stops already exist, skipping...');
       }
 
       if (!busesExist) {
         await this.populateBuses();
       } else {
-        console.log('🚍 Buses already exist, skipping...');
+        console.log('Buses already exist, skipping...');
       }
 
-      console.log('✅ Migration completed successfully!');
+      console.log('Migration completed successfully!');
     } catch (error) {
-      console.error('❌ Migration failed:', error);
+      console.error('Migration failed:', error);
       throw error;
     }
   }
@@ -236,7 +236,7 @@ export class FirebaseMigration {
     const routesCollection = collection(db, 'routes');
     for (const route of additionalRoutes) {
       await addDoc(routesCollection, route);
-      console.log(`✅ Added additional route: ${route.route_number}`);
+      console.log(`Added additional route: ${route.route_number}`);
     }
   }
 }

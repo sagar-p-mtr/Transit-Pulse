@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { MapPin, Users, Bus as BusIcon } from 'lucide-react';
 import bmtcApi, { BMTCBus, BMTCStop } from '../services/bmtcApi';
 import otherBusApi, { OtherBus } from '../services/otherBusApi';
@@ -26,12 +26,7 @@ const BusRouteMap: React.FC<BusRouteMapProps> = ({ selectedRoute, onStopSelect }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedProviders, setSelectedProviders] = useState<Record<string, boolean>>({
-    BMTC: true,
-    KSRTC: true,
-    APSRTC: true,
-    TNSTC: true,
-    BEST: true,
-    DTC: true
+    BMTC: true
   });
   const [usingFallbackData, setUsingFallbackData] = useState(false);
   const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -130,11 +125,14 @@ const BusRouteMap: React.FC<BusRouteMapProps> = ({ selectedRoute, onStopSelect }
         if (selectedRoute) {
           // Check if it's a BMTC route or other provider
           if (selectedRoute.startsWith('bmtc-')) {
-            // BMTC route
-            const [routeBuses, routeDetails] = await Promise.all([
+            // BMTC route - use allSettled for better error handling
+            const results = await Promise.allSettled([
               bmtcApi.getBusesByRoute(selectedRoute),
               bmtcApi.getRouteDetails(selectedRoute)
             ]);
+            
+            const routeBuses = results[0].status === 'fulfilled' ? results[0].value : [];
+            const routeDetails = results[1].status === 'fulfilled' ? results[1].value : null;
             
             setBuses(routeBuses);
             
@@ -287,8 +285,8 @@ const BusRouteMap: React.FC<BusRouteMapProps> = ({ selectedRoute, onStopSelect }
     return selectedProviders[provider];
   });
 
-  // Convert filtered buses to Google Maps format
-  const busMarkers: BusMarkerData[] = filteredBuses.map(bus => ({
+  // Convert filtered buses to Google Maps format with memoization
+  const busMarkers: BusMarkerData[] = useMemo(() => filteredBuses.map(bus => ({
     id: bus.id,
     position: { lat: bus.latitude, lng: bus.longitude },
     title: `${bus.routeName} - ${bus.vehicleNumber}`,
@@ -304,24 +302,26 @@ const BusRouteMap: React.FC<BusRouteMapProps> = ({ selectedRoute, onStopSelect }
     routeName: bus.routeName,
     lastUpdated: bus.lastUpdated,
     crowdPercentage: bus.crowdPercentage
-  }));
+  })), [filteredBuses]);
 
-  // Convert stops to Google Maps format
-  const stopMarkers: StopMarkerData[] = stops.map(stop => ({
+  // Convert stops to Google Maps format with memoization
+  const stopMarkers: StopMarkerData[] = useMemo(() => stops.map(stop => ({
     id: stop.id,
     position: { lat: stop.latitude, lng: stop.longitude },
     title: stop.name,
     content: '', // Content is handled inside GoogleMapsWrapper
     onStopSelect
-  }));
+  })), [stops, onStopSelect]);
 
-  // Create route data for Google Maps
-  const routeData: RouteData | undefined = routePath.length > 1 ? {
-    path: routePath,
-    color: '#3B82F6',
-    weight: 4,
-    opacity: 0.7
-  } : undefined;
+  // Create route data for Google Maps with memoization
+  const routeData: RouteData | undefined = useMemo(() => 
+    routePath.length > 1 ? {
+      path: routePath,
+      color: '#3B82F6',
+      weight: 4,
+      opacity: 0.7
+    } : undefined,
+  [routePath]);
 
   // Handle map load
   const handleMapLoad = (loadedMap: google.maps.Map) => {
@@ -346,10 +346,13 @@ const BusRouteMap: React.FC<BusRouteMapProps> = ({ selectedRoute, onStopSelect }
   return (
     <div className="relative h-[500px] overflow-hidden">
       {loading && (
-        <div className="absolute inset-0 bg-white bg-opacity-75 z-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 z-50 flex items-center justify-center">
           <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-2"></div>
-            <p className="text-blue-600">Loading bus data...</p>
+            <div className="relative">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent absolute top-0"></div>
+            </div>
+            <p className="text-blue-600 font-medium mt-3">Loading map...</p>
           </div>
         </div>
       )}
@@ -438,12 +441,7 @@ const BusRouteMap: React.FC<BusRouteMapProps> = ({ selectedRoute, onStopSelect }
                 onChange={() => handleProviderFilterChange(provider)}
               />
               <label htmlFor={provider} className="text-xs text-gray-700 cursor-pointer">
-                {provider} {provider === 'BMTC' ? '(Bangalore)' : 
-                           provider === 'KSRTC' ? '(Karnataka)' : 
-                           provider === 'APSRTC' ? '(Andhra Pradesh)' : 
-                           provider === 'TNSTC' ? '(Tamil Nadu)' : 
-                           provider === 'BEST' ? '(Mumbai)' : 
-                           provider === 'DTC' ? '(Delhi)' : ''}
+                {provider} {provider === 'BMTC' ? '(Bangalore)' : ''}
               </label>
             </div>
           ))}

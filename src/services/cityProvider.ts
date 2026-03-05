@@ -42,7 +42,7 @@ export const INDIAN_CITIES: Record<string, CityConfig> = {
         id: 'bmtc',
         name: 'BMTC',
         fullName: 'Bangalore Metropolitan Transport Corporation',
-        apiUrl: 'https://bmtc-api.onrender.com/api',
+        apiUrl: '', // Using mock data
         isActive: true,
         colorScheme: { primary: '#e74c3c', secondary: '#c0392b' }
       },
@@ -50,7 +50,7 @@ export const INDIAN_CITIES: Record<string, CityConfig> = {
         id: 'ksrtc',
         name: 'KSRTC',
         fullName: 'Karnataka State Road Transport Corporation',
-        apiUrl: 'https://ksrtc-api.onrender.com/api',
+        apiUrl: '', // Using mock data
         isActive: true,
         colorScheme: { primary: '#f39c12', secondary: '#e67e22' }
       }
@@ -67,7 +67,7 @@ export const INDIAN_CITIES: Record<string, CityConfig> = {
         id: 'dtc',
         name: 'DTC',
         fullName: 'Delhi Transport Corporation',
-        apiUrl: 'https://dtc-api.onrender.com/api',
+        apiUrl: '', // Using mock data
         isActive: true,
         colorScheme: { primary: '#2ecc71', secondary: '#27ae60' }
       },
@@ -75,7 +75,7 @@ export const INDIAN_CITIES: Record<string, CityConfig> = {
         id: 'cluster',
         name: 'Cluster',
         fullName: 'Delhi Cluster Bus Service',
-        apiUrl: 'https://cluster-api.onrender.com/api',
+        apiUrl: '', // Using mock data
         isActive: true,
         colorScheme: { primary: '#3498db', secondary: '#2980b9' }
       }
@@ -92,7 +92,7 @@ export const INDIAN_CITIES: Record<string, CityConfig> = {
         id: 'best',
         name: 'BEST',
         fullName: 'Brihanmumbai Electric Supply and Transport',
-        apiUrl: 'https://best-api.onrender.com/api',
+        apiUrl: '', // Using mock data
         isActive: true,
         colorScheme: { primary: '#9b59b6', secondary: '#8e44ad' }
       },
@@ -100,7 +100,7 @@ export const INDIAN_CITIES: Record<string, CityConfig> = {
         id: 'msrtc',
         name: 'MSRTC',
         fullName: 'Maharashtra State Road Transport Corporation',
-        apiUrl: 'https://msrtc-api.onrender.com/api',
+        apiUrl: '', // Using mock data
         isActive: true,
         colorScheme: { primary: '#e67e22', secondary: '#d35400' }
       }
@@ -117,7 +117,7 @@ export const INDIAN_CITIES: Record<string, CityConfig> = {
         id: 'mtc',
         name: 'MTC',
         fullName: 'Metropolitan Transport Corporation',
-        apiUrl: 'https://mtc-api.onrender.com/api',
+        apiUrl: '', // Using mock data
         isActive: true,
         colorScheme: { primary: '#1abc9c', secondary: '#16a085' }
       },
@@ -125,7 +125,7 @@ export const INDIAN_CITIES: Record<string, CityConfig> = {
         id: 'tnstc',
         name: 'TNSTC',
         fullName: 'Tamil Nadu State Transport Corporation',
-        apiUrl: 'https://tnstc-api.onrender.com/api',
+        apiUrl: '', // Using mock data
         isActive: true,
         colorScheme: { primary: '#f1c40f', secondary: '#f39c12' }
       }
@@ -142,7 +142,7 @@ export const INDIAN_CITIES: Record<string, CityConfig> = {
         id: 'tsrtc',
         name: 'TSRTC',
         fullName: 'Telangana State Road Transport Corporation',
-        apiUrl: 'https://tsrtc-api.onrender.com/api',
+        apiUrl: '', // Using mock data
         isActive: true,
         colorScheme: { primary: '#e74c3c', secondary: '#c0392b' }
       }
@@ -159,7 +159,7 @@ export const INDIAN_CITIES: Record<string, CityConfig> = {
         id: 'pmpml',
         name: 'PMPML',
         fullName: 'Pune Mahanagar Parivahan Mahamandal Limited',
-        apiUrl: 'https://pmpml-api.onrender.com/api',
+        apiUrl: '', // Using mock data
         isActive: true,
         colorScheme: { primary: '#9b59b6', secondary: '#8e44ad' }
       }

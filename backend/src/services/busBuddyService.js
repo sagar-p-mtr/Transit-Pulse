@@ -128,7 +128,7 @@ class BusBuddyService {
           
           suggestions.push({
             type: 'leave_now',
-            title: '🚌 Time to Leave!',
+            title: 'Time to Leave!',
             message: `Leave now to catch ${pattern.route_number} to ${pattern.destination}. Next bus in ${busETA} mins.`,
             routeId: pattern.route_id,
             suggestedDepartureTime: departureTime,

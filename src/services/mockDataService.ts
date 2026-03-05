@@ -138,12 +138,12 @@ class MockDataService {
   // Enable demo mode for offline testing
   enableDemoMode(): void {
     localStorage.setItem('demoMode', 'true');
-    console.log('🎯 Demo mode enabled - using mock data');
+    console.log('Demo mode enabled - using mock data');
   }
 
   disableDemoMode(): void {
     localStorage.removeItem('demoMode');
-    console.log('📡 Demo mode disabled - will try external APIs');
+    console.log('Demo mode disabled - will try external APIs');
   }
 
   isDemoMode(): boolean {
@@ -159,7 +159,7 @@ if (typeof window !== 'undefined') {
     // Check if we should auto-enable demo mode
     setTimeout(() => {
       if (!mockDataService.isDemoMode()) {
-        console.log('🚌 Starting in demo mode for better experience');
+        console.log('Starting in demo mode for better experience');
         mockDataService.enableDemoMode();
       }
     }, 2000);

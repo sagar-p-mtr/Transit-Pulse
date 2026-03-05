@@ -32,11 +32,127 @@ const LiveTrackingSection: React.FC<LiveTrackingSectionProps> = ({
   const [showFilters, setShowFilters] = useState(false);
   const [showMap, setShowMap] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<string>('');
+  const [showLocationPrompt, setShowLocationPrompt] = useState(true);
+  const [locationRequested, setLocationRequested] = useState(false);
   const [filters, setFilters] = useState({
-    providers: ['BMTC', 'KSRTC', 'APSRTC'],
+    providers: ['BMTC'],
     crowdLevels: ['Low', 'Medium', 'High'],
     routeTypes: ['Express', 'Ordinary', 'Volvo']
   });
+
+  const requestLocation = () => {
+    setLocationRequested(true);
+    setShowLocationPrompt(false);
+    
+    // Get user's current location with high accuracy using Google Maps Geocoding API
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          console.log('Current coordinates:', latitude, longitude);
+          
+          const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+          
+          if (!apiKey) {
+            console.warn('Google Maps API key not found, using default location');
+            setCurrentLocation('Bengaluru, Karnataka');
+            return;
+          }
+          
+          try {
+            // Use Google Maps Geocoding API for accurate reverse geocoding
+            const response = await fetch(
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
+            );
+            
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('Google Maps Geocoding data:', data);
+            
+            if (data.status === 'OK' && data.results && data.results.length > 0) {
+              const result = data.results[0];
+              console.log('Address components:', result.address_components);
+              console.log('Formatted address:', result.formatted_address);
+              
+              // Extract location components with priority for most specific details
+              let road = '';
+              let premise = '';
+              let sublocality_level_2 = '';
+              let sublocality_level_1 = '';
+              let locality = '';
+              let city = '';
+              let state = '';
+              
+              result.address_components.forEach((component: any) => {
+                if (component.types.includes('route') || component.types.includes('road')) {
+                  road = component.long_name;
+                } else if (component.types.includes('premise')) {
+                  premise = component.long_name;
+                } else if (component.types.includes('sublocality_level_2')) {
+                  sublocality_level_2 = component.long_name;
+                } else if (component.types.includes('sublocality_level_1') || component.types.includes('sublocality')) {
+                  sublocality_level_1 = component.long_name;
+                } else if (component.types.includes('locality')) {
+                  locality = component.long_name;
+                } else if (component.types.includes('administrative_area_level_2')) {
+                  city = city || component.long_name;
+                } else if (component.types.includes('administrative_area_level_1')) {
+                  state = component.long_name;
+                }
+              });
+              
+              // Build the most specific location string
+              // Priority: sublocality_level_2 > sublocality_level_1 > locality
+              const specificArea = sublocality_level_2 || sublocality_level_1 || locality || city;
+              const mainCity = locality || city || 'Bengaluru';
+              const finalState = state || 'Karnataka';
+              
+              console.log('Extracted details:');
+              console.log('- Road/Street:', road);
+              console.log('- Sublocality L2:', sublocality_level_2);
+              console.log('- Sublocality L1:', sublocality_level_1);
+              console.log('- Locality:', locality);
+              console.log('- City:', city);
+              console.log('- State:', state);
+              
+              // Create location string with most specific area
+              if (specificArea && specificArea !== mainCity) {
+                setCurrentLocation(`${specificArea}, ${mainCity}, ${finalState}`);
+              } else if (mainCity && finalState) {
+                setCurrentLocation(`${mainCity}, ${finalState}`);
+              } else {
+                // Use first part of formatted address as fallback
+                const addressParts = result.formatted_address.split(',').slice(0, 2).map((p: string) => p.trim());
+                setCurrentLocation(addressParts.join(', '));
+              }
+            } else {
+              console.error('Geocoding failed:', data.status);
+              setCurrentLocation(`Lat: ${latitude.toFixed(4)}, Lng: ${longitude.toFixed(4)}`);
+            }
+          } catch (error) {
+            console.error('Error fetching location from Google Maps:', error);
+            setCurrentLocation(`Lat: ${latitude.toFixed(4)}, Lng: ${longitude.toFixed(4)}`);
+          }
+        },
+        (error) => {
+          console.error('Geolocation error:', error.message, error.code);
+          // Set empty location when permission is denied or location fails
+          setCurrentLocation('');
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      setCurrentLocation('');
+    }
+  };
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -79,7 +195,7 @@ const LiveTrackingSection: React.FC<LiveTrackingSectionProps> = ({
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
             <div className="mb-4 lg:mb-0">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 {t('tracking.title')}
@@ -91,6 +207,43 @@ const LiveTrackingSection: React.FC<LiveTrackingSectionProps> = ({
                 {isDataStale && ` (${t('tracking.dataStale')})`}
               </p>
             </div>
+            
+            {/* Location Prompt - Ask user to enable location */}
+            {showLocationPrompt && !locationRequested && (
+              <div className="flex-shrink-0 lg:mx-4">
+                <button
+                  onClick={requestLocation}
+                  className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-500 hover:border-blue-600 rounded-xl px-6 py-3 shadow-md hover:shadow-lg transition-all"
+                >
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <div className="text-left">
+                      <p className="text-xs font-medium text-blue-700 dark:text-blue-300 uppercase tracking-wide">Enable Location</p>
+                      <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">Click to share your location</p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            )}
+            
+            {/* Current Location Box - Only show if location is available */}
+            {currentLocation && (
+              <div className="flex-shrink-0 lg:mx-4">
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-500 rounded-xl px-6 py-3 shadow-md">
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <MapPin className="h-5 w-5 text-green-600 dark:text-green-400 animate-pulse" />
+                      <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-xs font-medium text-green-700 dark:text-green-300 uppercase tracking-wide">Current Location</p>
+                      <p className="text-sm font-bold text-green-900 dark:text-green-100">{currentLocation}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center space-x-3">
               <button
                 onClick={handleRefresh}
@@ -183,7 +336,7 @@ const LiveTrackingSection: React.FC<LiveTrackingSectionProps> = ({
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">{t('tracking.busProviders')}</h4>
                 <div className="space-y-2">
-                  {['BMTC', 'KSRTC', 'APSRTC', 'TNSTC', 'BEST', 'DTC'].map(provider => (
+                  {['BMTC'].map(provider => (
                     <label key={provider} className="flex items-center">
                       <input
                         type="checkbox"

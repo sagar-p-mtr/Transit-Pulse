@@ -56,7 +56,7 @@ const BusRouteList: React.FC<BusRouteListProps> = ({
   const [usingFallbackData, setUsingFallbackData] = useState(false);
   const [showRouteDetails, setShowRouteDetails] = useState<RouteWithProvider | null>(null);
   const [showAllLocal, setShowAllLocal] = useState(showAll);
-  const providersList = ['BMTC', 'KSRTC', 'APSRTC', 'TNSTC', 'BEST', 'DTC'];
+  const providersList = ['BMTC'];
 
   useEffect(() => {
     setShowAllLocal(showAll);
@@ -169,11 +169,20 @@ const BusRouteList: React.FC<BusRouteListProps> = ({
 
   // Filter routes based on search query and selected provider
   const filteredRoutes = routes.filter(route => {
-    const matchesSearch = searchQuery === '' || 
-      route.routeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      route.source?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      route.destination?.toLowerCase().includes(searchQuery.toLowerCase());
+    // If search query is empty, show all routes
+    if (searchQuery === '') {
+      const matchesProvider = selectedProvider === null || route.provider === selectedProvider;
+      return matchesProvider;
+    }
     
+    // When searching, prioritize showing routes GOING TO the searched destination
+    const searchLower = searchQuery.toLowerCase();
+    const matchesDestination = route.destination?.toLowerCase().includes(searchLower);
+    
+    // Also match route number for convenience
+    const matchesRouteNumber = route.routeNumber?.toLowerCase().includes(searchLower);
+    
+    const matchesSearch = matchesDestination || matchesRouteNumber;
     const matchesProvider = selectedProvider === null || route.provider === selectedProvider;
     
     return matchesSearch && matchesProvider;
@@ -202,6 +211,37 @@ const BusRouteList: React.FC<BusRouteListProps> = ({
     const eventHint = buildEventHint(index);
     const transferHint = buildTransferHint(index, provider);
 
+    // Real Bangalore locations for BMTC routes
+    const bangaloreLocations = [
+      'Whitefield', 'Electronic City', 'Hebbal', 'Silk Board',
+      'Jayanagar', 'Koramangala', 'Indiranagar', 'BTM Layout', 'Banashankari',
+      'Yeshwanthpur', 'Marathahalli', 'KR Puram', 'Kengeri', 'Peenya',
+      'HSR Layout', 'Sarjapur', 'Bellandur', 'Yelahanka', 'Rajajinagar',
+      'JP Nagar', 'Vijayanagar', 'Malleswaram', 'Kammanahalli', 'RT Nagar',
+      'Bannerghatta Road', 'Bommanahalli', 'Dairy Circle', 'Shivajinagar'
+    ];
+
+    // Ensure many routes connect to/from Majestic (main bus station)
+    let source: string;
+    let destination: string;
+    
+    if (index % 3 === 0) {
+      // Routes FROM Majestic to various locations
+      source = 'Majestic';
+      destination = bangaloreLocations[index % bangaloreLocations.length];
+    } else if (index % 3 === 1) {
+      // Routes TO Majestic from various locations
+      source = bangaloreLocations[index % bangaloreLocations.length];
+      destination = 'Majestic';
+    } else {
+      // Routes between other locations
+      source = bangaloreLocations[index % bangaloreLocations.length];
+      destination = bangaloreLocations[(index + 5) % bangaloreLocations.length];
+    }
+    
+    const viaLocations = bangaloreLocations.filter(loc => loc !== source && loc !== destination);
+    const via = viaLocations[index % viaLocations.length] || 'City Center';
+
     let crowdPercentage: number;
     if (crowdLevel === 'Low') {
       crowdPercentage = Math.floor(Math.random() * 30) + 10;
@@ -214,11 +254,11 @@ const BusRouteList: React.FC<BusRouteListProps> = ({
     return {
       id: `${provider.toLowerCase()}-route-synth-${index}`,
       provider,
-      routeNumber: `${provider.substring(0, 2)}${200 + index}`,
-      routeName: `${provider} Route ${index + 1}`,
-      source: `${provider} Central`,
-      destination: `${provider} Terminal ${index % 6 + 1}`,
-      via: `Via ${provider} Junction`,
+      routeNumber: `${index % 100 < 50 ? '' : 'V'}${200 + index}${index % 10 === 0 ? 'E' : index % 7 === 0 ? 'A' : ''}`,
+      routeName: `${source} - ${destination}`,
+      source,
+      destination,
+      via: `Via ${via}`,
       frequency: `${6 + (index % 10)} min`,
       stops: [],
       status: getRandomStatus(),
@@ -356,40 +396,6 @@ const BusRouteList: React.FC<BusRouteListProps> = ({
           >
             BMTC
           </button>
-          <button
-            className={`text-xs px-2 py-1 rounded-full ${selectedProvider === 'KSRTC' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-            onClick={() => setSelectedProvider('KSRTC')}
-          >
-            KSRTC
-          </button>
-          <button
-            className={`text-xs px-2 py-1 rounded-full ${selectedProvider === 'APSRTC' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-            onClick={() => setSelectedProvider('APSRTC')}
-          >
-            APSRTC
-          </button>
-          {showAll && (
-            <>
-              <button
-                className={`text-xs px-2 py-1 rounded-full ${selectedProvider === 'TNSTC' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                onClick={() => setSelectedProvider('TNSTC')}
-              >
-                TNSTC
-              </button>
-              <button
-                className={`text-xs px-2 py-1 rounded-full ${selectedProvider === 'BEST' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                onClick={() => setSelectedProvider('BEST')}
-              >
-                BEST
-              </button>
-              <button
-                className={`text-xs px-2 py-1 rounded-full ${selectedProvider === 'DTC' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                onClick={() => setSelectedProvider('DTC')}
-              >
-                DTC
-              </button>
-            </>
-          )}
         </div>
       </div>
 

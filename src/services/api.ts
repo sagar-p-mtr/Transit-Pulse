@@ -4,9 +4,10 @@ import { generateMockBuses, generateMockRoutes, generateMockStopDetails } from '
 import { isLiveDataEnabled, ENABLE_REALTIME, REALTIME_URL } from '../config/runtime';
 
 // API Base URLs
-const BMTC_API_URL = 'https://bmtc-api.onrender.com/api';
-const KSRTC_API_URL = 'https://ksrtc-api.onrender.com/api';
-const APSRTC_API_URL = 'https://apsrtc-api.onrender.com/api';
+// Using local mock data only - external APIs removed
+const BMTC_API_URL = '';
+const KSRTC_API_URL = '';
+const APSRTC_API_URL = '';
 
 const createStubSocket = (): Socket => {
   const noop = () => {};

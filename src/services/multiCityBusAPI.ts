@@ -235,7 +235,7 @@ export class MultiCityBusAPI {
         features.specialFeatures.push('MTC divisions', 'Direction-based routes', 'Express services');
         break;
       case 'bangalore':
-        features.specialFeatures.push('BMTC Volvo buses', 'KSRTC integration', 'Tech park connectivity');
+        features.specialFeatures.push('BMTC Volvo buses', 'Tech park connectivity');
         break;
     }
 

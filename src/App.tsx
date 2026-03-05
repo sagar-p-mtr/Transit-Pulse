@@ -19,23 +19,23 @@ import ConnectionStatus from './components/ConnectionStatus';
 import OfflineIndicator from './components/OfflineIndicator';
 import ErrorBoundary from './components/ErrorBoundary';
 import LanguageSwitcher from './components/LanguageSwitcher';
-import VoiceControl from './components/VoiceControl';
+
 import FareCalculator from './components/FareCalculator';
 import DataModeToggle from './components/DataModeToggle';
 
-// New Phase 1 Components
+// UI Components
 import BottomNavigation from './components/BottomNavigation';
 import ThemeToggle from './components/ThemeToggle';
 import PullToRefresh from './components/ui/PullToRefresh';
 import { ThemeProvider } from './contexts/ThemeContext';
 
-// Phase 3 Advanced Components - The Cool Stuff! 🚀
+// Advanced Features
 import AIAssistant from './components/ai/AIAssistant';
 import SocialFeatures from './components/social/SocialFeatures';
 import Bus3DVisualization from './components/visualization/Bus3DVisualization';
 import UserDashboard from './components/UserDashboard';
 
-// NEW: Phase 4 - Unique Features! 🌟
+// AI and Prediction Features
 import BusBuddyAI from './components/BusBuddyAI';
 import WeatherAwareRoutes from './components/WeatherAwareRoutes';
 import CrowdPredictionWidget from './components/CrowdPredictionWidget';
@@ -62,12 +62,10 @@ function AppContent() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showUserDashboard, setShowUserDashboard] = useState(false);
   
-  // Phase 3 Advanced Features States 🚀
+  // Modal visibility states
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [show3DVisualization, setShow3DVisualization] = useState(false);
   const [showSocialFeatures, setShowSocialFeatures] = useState(false);
-  
-  // NEW: Phase 4 Unique Features States 🌟
   const [showBusBuddy, setShowBusBuddy] = useState(false);
   const [showWeatherRoutes, setShowWeatherRoutes] = useState(false);
   const [showCrowdPrediction, setShowCrowdPrediction] = useState(false);
@@ -91,9 +89,9 @@ function AppContent() {
           const routesExist = await firebaseMigration.checkCollectionExists('routes');
           
           if (!routesExist) {
-            console.log('🔥 Initializing Firebase with sample data...');
+            console.log('Initializing Firebase with sample data...');
             await firebaseMigration.runMigration();
-            console.log('✅ Firebase initialized successfully!');
+            console.log('Firebase initialized successfully!');
           }
         } catch (error) {
           console.warn('Firebase initialization skipped:', error);
@@ -232,9 +230,6 @@ function AppContent() {
           <LanguageSwitcher />
           <DataModeToggle />
         </div>
-
-        {/* Voice Control Button */}
-        <VoiceControl />
 
         {/* Header - Hide on mobile when using bottom navigation */}
         <div className={isMobile && activeSection === 'tracking' ? 'hidden' : ''}>
@@ -443,11 +438,6 @@ function AppContent() {
           />
         </ErrorBoundary>
       )}
-      
-
-
-        {/* Voice Control */}
-        <VoiceControl />
       </div>
     </ErrorBoundary>
   );

@@ -28,9 +28,9 @@ function getDb() {
   if (!db) {
     db = new sqlite3.Database(dbPath, (err) => {
       if (err) {
-        console.error('❌ Database connection error:', err);
+        console.error('Database connection error:', err);
       } else {
-        console.log('✅ Connected to SQLite database:', dbPath);
+        console.log('Connected to SQLite database:', dbPath);
         // Enable foreign keys
         db.run('PRAGMA foreign_keys = ON');
       }

@@ -3,8 +3,9 @@ import { CityBus, CityRoute, CityStop } from './cityProvider';
 import { isLiveDataEnabled } from '../config/runtime';
 
 // Mumbai BEST API Service
-const BEST_API_BASE_URL = 'https://best-api.onrender.com/api';
-const MSRTC_API_BASE_URL = 'https://msrtc-api.onrender.com/api';
+// Using local mock data only - external APIs removed
+const BEST_API_BASE_URL = '';
+const MSRTC_API_BASE_URL = '';
 
 // Types specific to Mumbai transport
 export interface BESTBus extends CityBus {

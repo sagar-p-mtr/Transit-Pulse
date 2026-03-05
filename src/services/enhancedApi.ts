@@ -15,11 +15,11 @@ let backendAvailable = false;
 backendApi.get('/health')
   .then(() => {
     backendAvailable = true;
-    console.log('✅ Backend connected!');
+    console.log('Backend connected!');
   })
   .catch(() => {
     backendAvailable = false;
-    console.log('⚠️ Backend not available, using mock data');
+    console.log('Backend not available, using mock data');
   });
 
 // Add token if available

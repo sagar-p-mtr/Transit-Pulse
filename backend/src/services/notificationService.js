@@ -20,9 +20,9 @@ class NotificationService {
           }),
         });
         this.initialized = true;
-        console.log('✅ Firebase Admin initialized');
+        console.log('Firebase Admin initialized');
       } else {
-        console.log('⚠️  Firebase not configured, notifications disabled');
+        console.log('Firebase not configured, notifications disabled');
       }
     } catch (error) {
       console.error('Firebase initialization error:', error.message);
@@ -52,7 +52,7 @@ class NotificationService {
       const bus = busResult.rows[0];
 
       const notification = {
-        title: '🚌 Bus Approaching!',
+        title: 'Bus Approaching!',
         body: `${bus.route_name} will arrive in ${eta} minutes`,
         data: {
           type: 'bus_approaching',

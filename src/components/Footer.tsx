@@ -27,10 +27,7 @@ const Footer: React.FC = () => {
   ];
 
   const operators = [
-    { name: "BMTC", description: "Bangalore Metropolitan Transport Corporation" },
-    { name: "KSRTC", description: "Karnataka State Road Transport Corporation" },
-    { name: "NWKRTC", description: "North Western Karnataka Road Transport Corporation" },
-    { name: "NEKRTC", description: "North Eastern Karnataka Road Transport Corporation" }
+    { name: "BMTC", description: "Bangalore Metropolitan Transport Corporation" }
   ];
 
   return (

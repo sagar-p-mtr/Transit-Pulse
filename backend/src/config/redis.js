@@ -16,7 +16,7 @@ try {
 
   redis.on('connect', () => {
     redisAvailable = true;
-    console.log('✅ Connected to Redis');
+    console.log('Connected to Redis');
   });
 
   redis.on('error', () => {
@@ -26,11 +26,11 @@ try {
   // Try to connect
   redis.connect().catch(() => {
     redisAvailable = false;
-    console.log('⚠️  Redis not available, using in-memory cache (this is fine!)');
+    console.log('Redis not available, using in-memory cache');
   });
 
 } catch (error) {
-  console.log('⚠️  Redis not available, using in-memory cache (this is fine!)');
+  console.log('Redis not available, using in-memory cache');
 }
 
 // In-memory cache as fallback

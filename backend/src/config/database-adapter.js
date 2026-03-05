@@ -169,15 +169,15 @@ if (USE_FIREBASE) {
       }
     };
     
-    console.log('✅ Using Firebase as database backend');
+    console.log('Using Firebase as database backend');
   } catch (error) {
-    console.error('❌ Failed to initialize Firebase, falling back to SQLite:', error);
+    console.error('Failed to initialize Firebase, falling back to SQLite:', error);
     db = require('./database');
   }
 } else {
   // Use SQLite
   db = require('./database');
-  console.log('✅ Using SQLite as database backend');
+  console.log('Using SQLite as database backend');
 }
 
 module.exports = db;

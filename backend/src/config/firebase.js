@@ -25,9 +25,9 @@ if (!firebaseApp) {
       firebaseApp = admin.initializeApp();
     }
     
-    console.log('✅ Firebase Admin SDK initialized successfully');
+    console.log('Firebase Admin SDK initialized successfully');
   } catch (error) {
-    console.error('❌ Firebase Admin SDK initialization failed:', error);
+    console.error('Firebase Admin SDK initialization failed:', error);
     throw error;
   }
 }

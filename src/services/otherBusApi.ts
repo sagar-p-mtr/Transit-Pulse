@@ -36,14 +36,8 @@ export interface OtherStop {
   longitude: number;
 }
 
-// API base URLs for different providers
-const API_URLS = {
-  'KSRTC': 'https://ksrtc-api.onrender.com/api',
-  'APSRTC': 'https://apsrtc-api.onrender.com/api',
-  'TNSTC': 'https://tnstc-api.onrender.com/api',
-  'BEST': 'https://best-api.onrender.com/api',
-  'DTC': 'https://dtc-api.onrender.com/api'
-};
+// Using local mock data only - external APIs removed
+const API_URLS: Record<string, string> = {};
 
 // Create axios instances with better timeout and retry logic
 const createAxiosInstance = (baseURL: string) => {

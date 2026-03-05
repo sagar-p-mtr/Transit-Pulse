@@ -52,12 +52,7 @@ const cityLocations: Record<string, [number, number]> = {
 
 // Provider-specific locations
 const providerLocations: Record<string, [number, number]> = {
-  'BMTC': cityLocations['Bangalore'],
-  'KSRTC': cityLocations['Mysore'],
-  'APSRTC': cityLocations['Hyderabad'],
-  'TNSTC': cityLocations['Chennai'],
-  'BEST': cityLocations['Mumbai'],
-  'DTC': cityLocations['Delhi']
+  'BMTC': cityLocations['Bangalore']
 };
 
 // Generate mock buses
@@ -102,12 +97,7 @@ export function generateMockRoutes(count: number, provider?: string): (BMTCRoute
   
   // Popular destinations for each provider
   const destinations: Record<string, string[]> = {
-    'BMTC': ['Majestic', 'Whitefield', 'Electronic City', 'Hebbal', 'Silk Board', 'Jayanagar', 'Koramangala'],
-    'KSRTC': ['Mysore', 'Hassan', 'Mangalore', 'Udupi', 'Shimoga', 'Hubli', 'Dharwad'],
-    'APSRTC': ['Hyderabad', 'Vijayawada', 'Tirupati', 'Visakhapatnam', 'Warangal', 'Guntur', 'Nellore'],
-    'TNSTC': ['Chennai', 'Coimbatore', 'Madurai', 'Trichy', 'Salem', 'Tirunelveli', 'Vellore'],
-    'BEST': ['Dadar', 'Andheri', 'Bandra', 'Borivali', 'Thane', 'Worli', 'Churchgate'],
-    'DTC': ['Connaught Place', 'Karol Bagh', 'Chandni Chowk', 'Lajpat Nagar', 'Saket', 'Dwarka', 'Rohini']
+    'BMTC': ['Majestic', 'Whitefield', 'Electronic City', 'Hebbal', 'Silk Board', 'Jayanagar', 'Koramangala']
   };
   
   for (let i = 0; i < count; i++) {

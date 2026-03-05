@@ -3,8 +3,9 @@ import { CityBus, CityRoute, CityStop } from './cityProvider';
 import { isLiveDataEnabled } from '../config/runtime';
 
 // Delhi Transport Corporation API Service
-const DTC_API_BASE_URL = 'https://dtc-api.onrender.com/api';
-const CLUSTER_API_BASE_URL = 'https://cluster-api.onrender.com/api';
+// Using local mock data only - external APIs removed
+const DTC_API_BASE_URL = '';
+const CLUSTER_API_BASE_URL = '';
 
 // Types specific to Delhi transport
 export interface DTCBus extends CityBus {

@@ -3,7 +3,8 @@ import { fallbackApi } from './api';
 import { isLiveDataEnabled } from '../config/runtime';
 
 // Base URL for the BMTC API
-const BMTC_API_BASE_URL = 'https://bmtc-api.onrender.com/api';
+// Using local mock data only - external API removed
+const BMTC_API_BASE_URL = '';
 
 // Types for BMTC API responses
 export interface BMTCBus {

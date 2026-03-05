@@ -49,8 +49,8 @@ const UserPreferences: React.FC<UserPreferencesProps> = ({ onClose }) => {
 
   const [favoriteRoutes, setFavoriteRoutes] = useState<string[]>(['Route 500', 'Route 335E', 'Route 201R']);
 
-  const cities = ['Bangalore', 'Hyderabad', 'Chennai', 'Mumbai', 'Delhi', 'Pune', 'Kochi'];
-  const providers = ['BMTC', 'KSRTC', 'APSRTC', 'TNSTC', 'BEST', 'DTC'];
+  const cities = ['Bangalore'];
+  const providers = ['BMTC'];
   const languages = [
     { code: 'en', name: 'English' },
     { code: 'hi', name: 'हिंदी' },

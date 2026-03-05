@@ -238,14 +238,14 @@ class WeatherService {
       }
     } else if (weather.temperature > 35) {
       if (score > 0.7) {
-        return '🌡️ Good choice - AC bus with covered stops';
+        return 'Good choice - AC bus with covered stops';
       } else {
-        return '☀️ Hot - Limited shade at stops';
+        return 'Hot weather - Limited shade at stops';
       }
     } else if (weather.condition === 'Mist') {
-      return '🌫️ Low visibility - Well-lit route recommended';
+      return 'Low visibility - Well-lit route recommended';
     }
-    return '✅ Normal weather - All routes suitable';
+    return 'Normal weather - All routes suitable';
   }
 
   /**

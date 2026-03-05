@@ -3,8 +3,9 @@ import { CityBus, CityRoute, CityStop } from './cityProvider';
 import { isLiveDataEnabled } from '../config/runtime';
 
 // Chennai MTC API Service
-const MTC_API_BASE_URL = 'https://mtc-api.onrender.com/api';
-const TNSTC_API_BASE_URL = 'https://tnstc-api.onrender.com/api';
+// Using local mock data only - external APIs removed
+const MTC_API_BASE_URL = '';
+const TNSTC_API_BASE_URL = '';
 
 // Types specific to Chennai transport
 export interface MTCBus extends CityBus {

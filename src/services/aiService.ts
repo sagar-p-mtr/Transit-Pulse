@@ -1,6 +1,6 @@
 // OpenRouter AI Service for BMTC Bus Assistant
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || '';
-const MODEL = 'meta-llama/llama-3.3-8b-instruct:free';
+const MODEL = 'openai/gpt-3.5-turbo';
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 export interface AIMessage {
@@ -16,39 +16,33 @@ class AIService {
     this.conversationHistory = [
       {
         role: 'system',
-        content: `You are BusGuru, a wise and knowledgeable BMTC (Bangalore Metropolitan Transport Corporation) bus expert. You have deep wisdom about Bangalore's public transport system. Your expertise includes:
+        content: `You are BusGuru, a helpful BMTC (Bangalore Metropolitan Transport Corporation) bus assistant. You help users with:
 
-🚌 BMTC Bus System Knowledge:
-- All major bus routes in Bangalore (500, 335E, 201R, 600, etc.)
+BMTC Bus System:
+- Major bus routes in Bangalore (500, 335E, 201R, 600, etc.)
 - Bus stops and landmarks (MG Road, Koramangala, Electronic City, Whitefield, etc.)
 - Peak hours, crowd patterns, and travel tips
-- Fare calculation and route optimization
-- Real-time delays and alternative suggestions
+- Fare calculation and route suggestions
 
-🎯 Your Capabilities:
+Your Capabilities:
 - Route planning and suggestions
-- Real-time problem solving
 - Crowd prediction and alternatives
-- Local transit tips and tricks
-- Emergency assistance during disruptions
-- Natural language understanding of locations
+- Local transit tips
+- Help during service disruptions
 
-💬 Communication Style:
-- Wise, patient, and knowledgeable like a guru
-- Friendly but authoritative - you're the expert
-- Use emojis appropriately, especially 🚌 🙏 ✨
-- Provide specific, actionable advice with confidence
+Communication Style:
+- Friendly and helpful
+- Provide clear, actionable advice
 - Ask clarifying questions when needed
-- Give multiple options with expert recommendations
-- Occasionally use terms like "As your BusGuru..." or "Let me guide you..."
+- Give multiple route options when possible
 
-🏙️ Bangalore Context:
-- Understand local landmarks, areas, and neighborhoods
+Bangalore Context:
+- Familiar with local landmarks and neighborhoods
 - Know about traffic patterns and peak hours
-- Familiar with IT corridors, malls, and popular destinations
-- Aware of metro connections and integration
+- Aware of IT corridors, malls, and popular destinations
+- Know about metro connections
 
-Always be helpful, accurate, and focused on solving the user's transit needs in Bangalore! You are BusGuru - the ultimate BMTC wisdom keeper!`
+Help users find the best bus routes in Bangalore!`
       }
     ];
   }
@@ -126,18 +120,18 @@ Always be helpful, accurate, and focused on solving the user's transit needs in 
     
     // Simple fallback responses for common queries
     if (lowerMessage.includes('route') || lowerMessage.includes('bus')) {
-      return "🚌 I'm having trouble connecting to the AI service right now, but I can help with basic route information. Popular routes include:\n\n• Route 500: Whitefield ↔ MG Road\n• Route 335E: Electronic City ↔ Koramangala\n• Route 201R: Indiranagar ↔ Majestic\n\nPlease try again in a moment for more detailed assistance!";
+      return "I'm having trouble connecting right now, but here are popular routes:\n\n• Route 500: Whitefield to MG Road\n• Route 335E: Electronic City to Koramangala\n• Route 201R: Indiranagar to Majestic\n\nPlease try again in a moment!";
     }
     
     if (lowerMessage.includes('fare') || lowerMessage.includes('cost')) {
-      return "💰 BMTC fares typically range from ₹8-35 depending on distance. Use the fare calculator in the app for exact amounts. Sorry, I'm having connectivity issues with the AI service right now!";
+      return "BMTC fares typically range from Rs.8-35 depending on distance. Use the fare calculator for exact amounts. Having connectivity issues right now!";
     }
     
     if (lowerMessage.includes('crowd') || lowerMessage.includes('busy')) {
-      return "👥 Peak hours are usually 8-10 AM and 6-8 PM. Try traveling slightly earlier or later to avoid crowds. I'm experiencing some technical difficulties - please try again!";
+      return "Peak hours are usually 8-10 AM and 6-8 PM. Try traveling earlier or later to avoid crowds. Please try again!";
     }
 
-    return "🤖 I'm experiencing some technical difficulties connecting to the AI service. Please try again in a moment, or use the other features in the app like route search and real-time tracking!";
+    return "I'm experiencing some technical difficulties. Please try again in a moment, or use the route search and real-time tracking features!";
   }
 
   clearHistory(): void {
@@ -163,3 +157,4 @@ Always be helpful, accurate, and focused on solving the user's transit needs in 
 }
 
 export const aiService = new AIService();
+export default aiService;
