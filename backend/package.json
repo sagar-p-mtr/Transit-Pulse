@@ -1,7 +1,7 @@
 {
-  "name": "whereismybus-backend",
+  "name": "transit-pulse-backend",
   "version": "1.0.0",
-  "description": "Backend for Where Is My Bus - Final Year Project",
+  "description": "Backend for Transit Pulse - Final Year Project",
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",

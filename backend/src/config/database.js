@@ -9,7 +9,7 @@ if (!fs.existsSync(dbDir)) {
 }
 
 // SQLite database file path
-const dbPath = process.env.DB_PATH || path.join(dbDir, 'whereismybus.db');
+const dbPath = process.env.DB_PATH || path.join(dbDir, 'transitpulse.db');
 
 // Initialize SQLite database
 let db = null;

@@ -92,7 +92,7 @@ router.get('/routes/all', async (req, res) => {
   }
 });
 
-// Search bus by bus number (for "Where is My Bus" feature)
+// Search bus by bus number (for "Transit Pulse" feature)
 // MUST come before /:busId to avoid route conflicts
 router.get('/search/:busNumber', async (req, res) => {
   try {

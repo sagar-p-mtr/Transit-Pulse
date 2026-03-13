@@ -322,7 +322,7 @@ const LiveTrackingSection: React.FC<LiveTrackingSectionProps> = ({
               }`}
             >
               <Bus className="h-4 w-4" />
-              <span className="hidden sm:inline">Where is My Bus?</span>
+              <span className="hidden sm:inline">Transit Pulse</span>
             </button>
           </div>
         </div>

@@ -119,7 +119,7 @@ server.listen(PORT, () => {
   console.log(`
 ╔═══════════════════════════════════════════════════════╗
 ║                                                       ║
-║   🚌 Where Is My Bus - Backend Server                ║
+║   🚌 Transit Pulse - Backend Server                ║
 ║                                                       ║
 ║   🚀 Server: http://localhost:${PORT}                   ║
 ║   🌍 Environment: ${process.env.NODE_ENV || 'development'}                 ║

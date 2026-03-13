@@ -1,4 +1,4 @@
-# 🚌 Where Is My Bus - Backend
+# 🚌 Transit Pulse - Backend
 
 ## Quick Start
 

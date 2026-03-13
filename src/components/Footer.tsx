@@ -39,7 +39,7 @@ const Footer: React.FC = () => {
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-2 mb-6">
               <Bus className="h-8 w-8 text-blue-500" />
-              <span className="text-2xl font-bold">WhereIsMyBus</span>
+              <span className="text-2xl font-bold">Transit Pulse</span>
             </div>
             <p className="text-gray-300 mb-6 leading-relaxed">
               Making public transportation smarter, more reliable, and accessible for everyone. 
@@ -54,7 +54,7 @@ const Footer: React.FC = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-blue-500 flex-shrink-0" />
-                <span className="text-gray-300">contact@whereismybus.com</span>
+                <span className="text-gray-300">contact@transitpulse.com</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-blue-500 flex-shrink-0" />
@@ -238,7 +238,7 @@ const Footer: React.FC = () => {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-400 mb-4 md:mb-0">
-              © 2024 WhereIsMyBus. All rights reserved.
+              © 2024 Transit Pulse. All rights reserved.
             </div>
             <div className="flex space-x-6 text-sm">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">

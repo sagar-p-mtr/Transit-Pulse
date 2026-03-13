@@ -55,7 +55,7 @@ class AIEnhancedBusBuddy {
             'Authorization': `Bearer ${this.API_KEY}`,
             'Content-Type': 'application/json',
             'HTTP-Referer': 'http://localhost:5000',
-            'X-Title': 'Bus Buddy AI - Where Is My Bus'
+            'X-Title': 'Bus Buddy AI - Transit Pulse'
           }
         }
       );

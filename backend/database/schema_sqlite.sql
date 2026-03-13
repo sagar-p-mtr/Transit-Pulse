@@ -1,4 +1,4 @@
--- SQLite Database Schema for Where Is My Bus
+-- SQLite Database Schema for Transit Pulse
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (

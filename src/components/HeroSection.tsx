@@ -296,7 +296,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartTracking }) => {
                       <Zap className="w-6 h-6" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold">About WhereIsMyBus</h2>
+                      <h2 className="text-2xl font-bold">About Transit Pulse</h2>
                       <p className="text-purple-100 text-sm">Your Smart Transit Companion</p>
                     </div>
                   </div>
@@ -318,7 +318,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartTracking }) => {
                     What We Do
                   </h3>
                   <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                    WhereIsMyBus is your personal bus tracking assistant that makes public transportation 
+                    Transit Pulse is your personal bus tracking assistant that makes public transportation 
                     easy and predictable. We help you know exactly when your bus will arrive, how crowded 
                     it is, and the best routes to take - all in real-time!
                   </p>
@@ -446,7 +446,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartTracking }) => {
                     Start Tracking Now! 🚀
                   </button>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                    Join thousands of smart commuters already using WhereIsMyBus
+                    Join thousands of smart commuters already using Transit Pulse
                   </p>
                 </div>
               </div>

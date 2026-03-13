@@ -110,7 +110,7 @@ class PWAService {
       icon: '/icons/icon-192x192.png',
       badge: '/icons/badge-72x72.png',
       vibrate: [100, 50, 100],
-      tag: 'whereismybus',
+      tag: 'transitpulse',
       renotify: true,
       ...options
     };
@@ -133,7 +133,7 @@ class PWAService {
     installBanner.innerHTML = `
       <div class="flex items-center justify-between">
         <div class="flex-1">
-          <h4 class="font-semibold text-sm">Install WhereIsMyBus</h4>
+          <h4 class="font-semibold text-sm">Install Transit Pulse</h4>
           <p class="text-xs opacity-90">Get faster access with our app!</p>
         </div>
         <div class="flex space-x-2 ml-4">
@@ -184,7 +184,7 @@ class PWAService {
   }
 
   private showInstallSuccess() {
-    this.showNotification('WhereIsMyBus Installed!', {
+    this.showNotification('Transit Pulse Installed!', {
       body: 'You can now track buses offline and get push notifications.',
       icon: '/icons/icon-192x192.png'
     });
@@ -305,7 +305,7 @@ class PWAService {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'WhereIsMyBus - Real-time Bus Tracking',
+          title: 'Transit Pulse - Real-time Bus Tracking',
           text: 'Track buses in real-time across India with crowd detection!',
           url: window.location.origin,
         });

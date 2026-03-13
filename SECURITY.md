@@ -2,7 +2,7 @@
 
 ## 🔒 Reporting a Vulnerability
 
-We take the security of Where Is My Bus seriously. If you discover a security vulnerability, please follow these steps:
+We take the security of Transit Pulse seriously. If you discover a security vulnerability, please follow these steps:
 
 ### How to Report
 
@@ -10,7 +10,7 @@ We take the security of Where Is My Bus seriously. If you discover a security vu
 
 Instead, please report security issues by:
 
-1. **Email:** Send details to **security@whereismybus.in** (or your actual email)
+1. **Email:** Send details to **security@transitpulse.in** (or your actual email)
 2. **Subject:** Include "SECURITY" in the subject line
 3. **Details:** Provide as much information as possible:
    - Type of vulnerability
@@ -169,11 +169,11 @@ Security researchers who responsibly disclose vulnerabilities will be:
 ## 📞 Contact
 
 For security-related questions or concerns:
-- **Email:** security@whereismybus.in
+- **Email:** security@transitpulse.in
 - **GitHub:** Open a security advisory (private)
 
 ---
 
 **Last Updated:** December 4, 2024
 
-Thank you for helping keep Where Is My Bus and our users safe! 🛡️
+Thank you for helping keep Transit Pulse and our users safe! 🛡️

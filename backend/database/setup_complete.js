@@ -12,7 +12,7 @@ if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
-const dbPath = process.env.DB_PATH || path.join(dbDir, 'whereismybus.db');
+const dbPath = process.env.DB_PATH || path.join(dbDir, 'transitpulse.db');
 
 console.log('📦 Setting up SQLite database...\n');
 
@@ -178,7 +178,7 @@ db.serialize(() => {
           console.log(`   🚏 Stops: ${row.count}`);
           
           console.log('\n🎉 Database setup complete!');
-          console.log('\n💡 You can now search for these buses in "Where is My Bus?":');
+          console.log('\n💡 You can now search for these buses in "Transit Pulse?":');
           console.log('   • KA-01-AB-1234 (or just "1234")');
           console.log('   • KA-01-CD-5678 (or just "5678")');
           console.log('   • KA-01-EF-9012 (or just "9012")');

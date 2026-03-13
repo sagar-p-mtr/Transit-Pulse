@@ -13,7 +13,7 @@ if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
-const dbPath = process.env.DB_PATH || path.join(dbDir, 'whereismybus.db');
+const dbPath = process.env.DB_PATH || path.join(dbDir, 'transitpulse.db');
 
 // Helper function to generate UUID (for use in INSERT statements)
 function generateUUID() {

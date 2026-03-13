@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "WhereIsMyBus",
+    "appName": "Transit Pulse",
     "loading": "Loading...",
     "error": "Error",
     "retry": "Retry",

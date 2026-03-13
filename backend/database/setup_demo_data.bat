@@ -6,7 +6,7 @@ echo ====================================================
 echo.
 
 echo Step 1: Creating demo user and sample data...
-psql -U postgres -d whereismybus -f create_demo_user.sql
+psql -U postgres -d transitpulse -f create_demo_user.sql
 
 echo.
 echo ====================================================

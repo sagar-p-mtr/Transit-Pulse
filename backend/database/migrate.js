@@ -15,7 +15,7 @@ if (!fs.existsSync(envPath)) {
   console.log('-------------------');
   console.log('DB_HOST=localhost');
   console.log('DB_PORT=5432');
-  console.log('DB_NAME=whereismybus');
+  console.log('DB_NAME=transitpulse');
   console.log('DB_USER=postgres');
   console.log('DB_PASSWORD=yourpassword   ← PUT YOUR POSTGRES PASSWORD HERE!');
   console.log('');
@@ -36,7 +36,7 @@ if (!process.env.DB_PASSWORD) {
 const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT) || 5432,
-  database: process.env.DB_NAME || 'whereismybus',
+  database: process.env.DB_NAME || 'transitpulse',
   user: process.env.DB_USER || 'postgres',
   password: String(process.env.DB_PASSWORD), // Ensure it's a string
 });

@@ -232,7 +232,7 @@ export class CityProviderService {
             timeout: 15000,
             headers: {
               'Content-Type': 'application/json',
-              'User-Agent': 'WhereIsMyBusIndia/1.0'
+              'User-Agent': 'TransitPulse/1.0'
             }
           });
         }

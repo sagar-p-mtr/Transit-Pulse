@@ -96,7 +96,7 @@ export const busApi = {
   getBusById: (busId: string) =>
     api.get(`/buses/${busId}`),
 
-  // Search bus by bus number (for "Where is My Bus" feature)
+  // Search bus by bus number (for "Transit Pulse" feature)
   searchBusByNumber: (busNumber: string) =>
     api.get(`/buses/search/${busNumber}`),
 

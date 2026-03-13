@@ -17,7 +17,7 @@ async function populateData() {
     console.log('👤 Creating demo user...');
     await pool.query(`
       INSERT INTO users (id, phone_number, email, name, wallet_balance, created_at)
-      VALUES ('00000000-0000-0000-0000-000000000001', '9999999999', 'demo@whereismybus.com', 'Demo User', 100.00, NOW())
+      VALUES ('00000000-0000-0000-0000-000000000001', '9999999999', 'demo@transitpulse.com', 'Demo User', 100.00, NOW())
       ON CONFLICT (id) DO NOTHING
     `);
 

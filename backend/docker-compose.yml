@@ -3,9 +3,9 @@ version: '3.8'
 services:
   postgres:
     image: postgis/postgis:15-3.3
-    container_name: whereismybus-postgres
+    container_name: transitpulse-postgres
     environment:
-      POSTGRES_DB: whereismybus
+      POSTGRES_DB: transitpulse
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password123
     ports:
@@ -16,7 +16,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: whereismybus-redis
+    container_name: transitpulse-redis
     ports:
       - "6379:6379"
     volumes:
@@ -25,7 +25,7 @@ services:
 
   mqtt:
     image: eclipse-mosquitto:latest
-    container_name: whereismybus-mqtt
+    container_name: transitpulse-mqtt
     ports:
       - "1883:1883"
       - "9001:9001"

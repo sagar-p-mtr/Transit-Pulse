@@ -196,4 +196,4 @@ This project is developed for academic purposes as part of the B.E. Final Year P
 
 ---
 
-**Final Year B.E. Project - Where Is My Bus India**
+**Final Year B.E. Project - Transit Pulse**

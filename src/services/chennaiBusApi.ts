@@ -32,7 +32,7 @@ const mtcAxios = axios.create({
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
-    'User-Agent': 'WhereIsMyBusIndia/1.0'
+    'User-Agent': 'TransitPulse/1.0'
   }
 });
 
@@ -41,7 +41,7 @@ const tnstcAxios = axios.create({
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
-    'User-Agent': 'WhereIsMyBusIndia/1.0'
+    'User-Agent': 'TransitPulse/1.0'
   }
 });
 
