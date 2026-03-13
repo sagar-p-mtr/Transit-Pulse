@@ -78,6 +78,8 @@ function AppContent() {
 
   // Initialize PWA features and Firebase
   useEffect(() => {
+    document.title = 'Transit Pulse - Real-time Bus Tracking';
+
     // Initialize PWA features
     initializePWA();
 

@@ -8,12 +8,42 @@ class PWAService {
   private deferredPrompt: PWAInstallPromptEvent | null = null;
   private isInstalled = false;
   private notificationPermission: NotificationPermission = 'default';
+  private readonly rebrandVersion = 'transit-pulse-v2';
 
   constructor() {
     this.checkInstallStatus();
     this.setupInstallPrompt();
     this.setupNotifications();
+    void this.migrateLegacyBrandingCache();
     this.registerServiceWorker();
+  }
+
+  private async migrateLegacyBrandingCache() {
+    const migrationKey = `brand_migration_${this.rebrandVersion}`;
+    if (localStorage.getItem(migrationKey) === 'done') {
+      return;
+    }
+
+    try {
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((registration) => registration.unregister()));
+      }
+
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map((name) => caches.delete(name)));
+      }
+
+      Object.keys(localStorage)
+        .filter((key) => key.toLowerCase().includes('whereismybus'))
+        .forEach((key) => localStorage.removeItem(key));
+
+      localStorage.setItem(migrationKey, 'done');
+      window.location.reload();
+    } catch (error) {
+      console.warn('Brand migration cache cleanup skipped:', error);
+    }
   }
 
   private checkInstallStatus() {
